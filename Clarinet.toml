@@ -27,6 +27,10 @@ depends_on = ["executor-dao", "extension-trait", "ede001-proposal-voting"]
 path = "contracts/extensions/ede005-dev-fund.clar"
 depends_on = ["executor-dao", "extension-trait", "ede000-governance-token"]
 
+[contracts.ede006-members]
+path = "contracts/extensions/ede006-members.clar"
+depends_on = ["executor-dao", "extension-trait"]
+
 [contracts.edp000-bootstrap]
 path = "contracts/proposals/edp000-bootstrap.clar"
 depends_on = ["executor-dao", "proposal-trait", "extension-trait", "ede000-governance-token", "ede001-proposal-voting", "ede002-proposal-submission", "ede003-emergency-proposals", "ede004-emergency-execute"]

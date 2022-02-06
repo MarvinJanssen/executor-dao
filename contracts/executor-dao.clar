@@ -1,5 +1,5 @@
-;; ExecutorDAO is the one DAO to rule them all. 
-;; By Marvin Janssen
+;; StackerDAOs
+;; Forked from ExecutorDAO
 
 (use-trait proposal-trait .proposal-trait.proposal-trait)
 (use-trait extension-trait .extension-trait.extension-trait)
