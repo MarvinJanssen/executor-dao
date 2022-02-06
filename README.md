@@ -1,5 +1,5 @@
 # StackerDAO
-> A huge shoutout to Marvin for kicking things off with **StackerDAO** and allowing us to fork his work and expand, you can find it [here](https://github.com/MarvinJanssen/executor-dao).
+> A huge shoutout to Marvin for kicking things off with **ExecutorDAO** and allowing us to fork his work and expand, you can find it [here](https://github.com/MarvinJanssen/executor-dao).
 
 StackerDAOs is a fork of ExecutorDAO, and models its design in the same modular and flexible way. The core tenets remain the same:
 
