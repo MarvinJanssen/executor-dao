@@ -1,4 +1,4 @@
-;; Title: EDP003 Whitelist Escrow NFT
+;; Title: SDP003 Whitelist Escrow NFT
 ;; Author: Marvin Janssen
 ;; Synopsis:
 ;; An example proposal to illustrate how ExecutorDAO can manage external

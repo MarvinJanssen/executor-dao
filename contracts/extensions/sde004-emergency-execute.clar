@@ -1,4 +1,4 @@
-;; Title: EDE004 Emergency Execute
+;; Title: SDE004 Emergency Execute
 ;; Author: Marvin Janssen
 ;; Depends-On: 
 ;; Synopsis:
@@ -17,11 +17,11 @@
 
 (define-data-var executive-team-sunset-height uint (+ block-height u4380)) ;; ~1 month from deploy time
 
-(define-constant err-unauthorised (err u3000))
-(define-constant err-not-executive-team-member (err u3001))
-(define-constant err-already-executed (err u3002))
-(define-constant err-sunset-height-reached (err u3003))
-(define-constant err-sunset-height-in-past (err u3004))
+(define-constant err-unauthorised (err u2800))
+(define-constant err-not-executive-team-member (err u2801))
+(define-constant err-already-executed (err u2802))
+(define-constant err-sunset-height-reached (err u2803))
+(define-constant err-sunset-height-in-past (err u2804))
 
 (define-map executive-team principal bool)
 (define-map executive-action-signals {proposal: principal, team-member: principal} bool)
@@ -29,7 +29,7 @@
 
 (define-data-var executive-signals-required uint u1) ;; signals required for an executive action.
 
-;; --- Authorisation check
+;; --- Authorization check
 
 (define-public (is-dao-or-extension)
 	(ok (asserts! (or (is-eq tx-sender .executor-dao) (contract-call? .executor-dao is-extension contract-caller)) err-unauthorised))

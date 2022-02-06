@@ -1,6 +1,6 @@
 ;; An example external contract to show how the ExecutorDAO is able to
 ;; manage external contracts that might not be aware of the DAO. See
-;; edp003-whitelist-escrow-nft for more details.
+;; sdp003-whitelist-escrow-nft for more details.
 
 (impl-trait .ownable-trait.ownable-trait)
 
@@ -79,4 +79,3 @@
 		(send-nft token-id tx-sender nft)
 	)
 )
-

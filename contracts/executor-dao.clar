@@ -12,7 +12,7 @@
 (define-map executed-proposals principal uint)
 (define-map extensions principal bool)
 
-;; --- Authorisation check
+;; --- Authorization check
 
 (define-private (is-self-or-extension)
 	(ok (asserts! (or (is-eq tx-sender (as-contract tx-sender)) (is-extension contract-caller)) err-unauthorised))
@@ -61,9 +61,9 @@
 	)
 )
 
-;; --- Bootstrap
+;; --- Initial DAO setup with extensions, members, team members, and executive members
 
-(define-public (construct (proposal <proposal-trait>))
+(define-public (initialize (proposal <proposal-trait>))
 	(let ((sender tx-sender))
 		(asserts! (is-eq sender (var-get executive)) err-unauthorised)
 		(var-set executive (as-contract tx-sender))

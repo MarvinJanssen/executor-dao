@@ -1,10 +1,10 @@
-;; Title: EDE005 Dev Fund
+;; Title: SDE005 Dev Fund
 ;; Author: Marvin Janssen
-;; Depends-On: EDP000
+;; Depends-On: SDP000
 ;; Synopsis:
 ;; A simple pre-seeded dev fund that can pay out developers on a monthly basis.
 ;; Description:
-;; Initialised by EDP001 Dev Fund. Developers can be awarded a monthly allowance
+;; Initialised by SDP001 Dev Fund. Developers can be awarded a monthly allowance
 ;; and can claim it from this extension. Principals can be added and removed, and
 ;; allowances can be changed via future proposals.
 
@@ -21,7 +21,7 @@
 (define-map monthly-developer-allowances principal uint)
 (define-map claim-counts principal uint)
 
-;; --- Authorisation check
+;; --- Authorization check
 
 (define-public (is-dao-or-extension)
 	(ok (asserts! (or (is-eq tx-sender .executor-dao) (contract-call? .executor-dao is-extension contract-caller)) err-unauthorised))
@@ -57,7 +57,7 @@
 (define-public (transfer (amount uint) (recipient principal) (memo (optional (buff 34))))
 	(begin
 		(try! (is-dao-or-extension))
-		(as-contract (contract-call? .ede000-governance-token transfer amount tx-sender recipient memo))
+		(as-contract (contract-call? .sde000-governance-token transfer amount tx-sender recipient memo))
 	)
 )
 
@@ -84,7 +84,7 @@
 		(asserts! (> allowance u0) err-no-allowance)
 		(asserts! (< claim-count max-claims) err-already-claimed)
 		(map-set claim-counts tx-sender max-claims)
-		(as-contract (contract-call? .ede000-governance-token transfer (* (- max-claims claim-count) allowance) tx-sender developer memo))
+		(as-contract (contract-call? .sde000-governance-token transfer (* (- max-claims claim-count) allowance) tx-sender developer memo))
 	)
 )
 

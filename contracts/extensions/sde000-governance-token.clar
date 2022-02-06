@@ -1,4 +1,4 @@
-;; Title: EDE000 Governance Token
+;; Title: SDE000 Governance Token
 ;; Author: Marvin Janssen
 ;; Depends-On: 
 ;; Synopsis:
@@ -12,18 +12,18 @@
 (impl-trait .sip010-ft-trait.sip010-ft-trait)
 (impl-trait .extension-trait.extension-trait)
 
-(define-constant err-unauthorised (err u3000))
+(define-constant err-unauthorised (err u2400))
 (define-constant err-not-token-owner (err u4))
 
-(define-fungible-token edg-token)
-(define-fungible-token edg-token-locked)
+(define-fungible-token stacker-dao-token)
+(define-fungible-token stacker-dao-token-locked)
 
-(define-data-var token-name (string-ascii 32) "ExecutorDAO Governance Token")
-(define-data-var token-symbol (string-ascii 10) "EDG")
+(define-data-var token-name (string-ascii 32) "StackerDAO Governance Token")
+(define-data-var token-symbol (string-ascii 10) "SDG")
 (define-data-var token-uri (optional (string-utf8 256)) none)
 (define-data-var token-decimals uint u6)
 
-;; --- Authorisation check
+;; --- Authorization check
 
 (define-public (is-dao-or-extension)
 	(ok (asserts! (or (is-eq tx-sender .executor-dao) (contract-call? .executor-dao is-extension contract-caller)) err-unauthorised))
@@ -33,40 +33,40 @@
 
 ;; governance-token-trait
 
-(define-public (edg-transfer (amount uint) (sender principal) (recipient principal))
+(define-public (sdg-transfer (amount uint) (sender principal) (recipient principal))
 	(begin
 		(try! (is-dao-or-extension))
-		(ft-transfer? edg-token amount sender recipient)
+		(ft-transfer? stacker-dao-token amount sender recipient)
 	)
 )
 
-(define-public (edg-lock (amount uint) (owner principal))
+(define-public (sdg-lock (amount uint) (owner principal))
 	(begin
 		(try! (is-dao-or-extension))
-		(try! (ft-burn? edg-token amount owner))
-		(ft-mint? edg-token-locked amount owner)
+		(try! (ft-burn? stacker-dao-token amount owner))
+		(ft-mint? stacker-dao-token-locked amount owner)
 	)
 )
 
-(define-public (edg-unlock (amount uint) (owner principal))
+(define-public (sdg-unlock (amount uint) (owner principal))
 	(begin
 		(try! (is-dao-or-extension))
-		(try! (ft-burn? edg-token-locked amount owner))
-		(ft-mint? edg-token amount owner)
+		(try! (ft-burn? stacker-dao-token-locked amount owner))
+		(ft-mint? stacker-dao-token amount owner)
 	)
 )
 
-(define-public (edg-mint (amount uint) (recipient principal))
+(define-public (sdg-mint (amount uint) (recipient principal))
 	(begin
 		(try! (is-dao-or-extension))
-		(ft-mint? edg-token amount recipient)
+		(ft-mint? stacker-dao-token amount recipient)
 	)
 )
 
-(define-public (edg-burn (amount uint) (owner principal))
+(define-public (sdg-burn (amount uint) (owner principal))
 	(begin
 		(try! (is-dao-or-extension))
-		(ft-burn? edg-token amount owner)
+		(ft-burn? stacker-dao-token amount owner)
 	)
 )
 
@@ -100,14 +100,14 @@
 	)
 )
 
-(define-private (edg-mint-many-iter (item {amount: uint, recipient: principal}))
-	(ft-mint? edg-token (get amount item) (get recipient item))
+(define-private (sdg-mint-many-iter (item {amount: uint, recipient: principal}))
+	(ft-mint? stacker-dao-token (get amount item) (get recipient item))
 )
 
-(define-public (edg-mint-many (recipients (list 200 {amount: uint, recipient: principal})))
+(define-public (sdg-mint-many (recipients (list 200 {amount: uint, recipient: principal})))
 	(begin
 		(try! (is-dao-or-extension))
-		(ok (map edg-mint-many-iter recipients))
+		(ok (map sdg-mint-many-iter recipients))
 	)
 )
 
@@ -118,7 +118,7 @@
 (define-public (transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))
 	(begin
 		(asserts! (or (is-eq tx-sender sender) (is-eq contract-caller sender)) err-not-token-owner)
-		(ft-transfer? edg-token amount sender recipient)
+		(ft-transfer? stacker-dao-token amount sender recipient)
 	)
 )
 
@@ -135,11 +135,11 @@
 )
 
 (define-read-only (get-balance (who principal))
-	(ok (+ (ft-get-balance edg-token who) (ft-get-balance edg-token-locked who)))
+	(ok (+ (ft-get-balance stacker-dao-token who) (ft-get-balance stacker-dao-token-locked who)))
 )
 
 (define-read-only (get-total-supply)
-	(ok (+ (ft-get-supply edg-token) (ft-get-supply edg-token-locked)))
+	(ok (+ (ft-get-supply stacker-dao-token) (ft-get-supply stacker-dao-token-locked)))
 )
 
 (define-read-only (get-token-uri)
@@ -148,16 +148,16 @@
 
 ;; governance-token-trait
 
-(define-read-only (edg-get-balance (who principal))
+(define-read-only (sdg-get-balance (who principal))
 	(get-balance who)
 )
 
-(define-read-only (edg-has-percentage-balance (who principal) (factor uint))
+(define-read-only (sdg-has-percentage-balance (who principal) (factor uint))
 	(ok (>= (* (unwrap-panic (get-balance who)) factor) (* (unwrap-panic (get-total-supply)) u1000)))
 )
 
-(define-read-only (edg-get-locked (owner principal))
-	(ok (ft-get-balance edg-token-locked owner))
+(define-read-only (sdg-get-locked (owner principal))
+	(ok (ft-get-balance stacker-dao-token-locked owner))
 )
 
 ;; --- Extension callback

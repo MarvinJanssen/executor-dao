@@ -1,6 +1,6 @@
-;; Title: EDE003 Emergency Proposals
+;; Title: SDE003 Emergency Proposals
 ;; Author: Marvin Janssen
-;; Depends-On: EDE001
+;; Depends-On: SDE001
 ;; Synopsis:
 ;; This extension allows for the creation of emergency proposals by a few trusted
 ;; principals.
@@ -18,14 +18,14 @@
 (define-data-var emergency-proposal-duration uint u144) ;; ~1 day
 (define-data-var emergency-team-sunset-height uint (+ block-height u13140)) ;; ~3 months from deploy time
 
-(define-constant err-unauthorised (err u3000))
-(define-constant err-not-emergency-team-member (err u3001))
-(define-constant err-sunset-height-reached (err u3002))
-(define-constant err-sunset-height-in-past (err u3003))
+(define-constant err-unauthorised (err u2700))
+(define-constant err-not-emergency-team-member (err u2701))
+(define-constant err-sunset-height-reached (err u2702))
+(define-constant err-sunset-height-in-past (err u2703))
 
 (define-map emergency-team principal bool)
 
-;; --- Authorisation check
+;; --- Authorization check
 
 (define-public (is-dao-or-extension)
 	(ok (asserts! (or (is-eq tx-sender .executor-dao) (contract-call? .executor-dao is-extension contract-caller)) err-unauthorised))
@@ -65,7 +65,7 @@
 	(begin
 		(asserts! (is-emergency-team-member tx-sender) err-not-emergency-team-member)
 		(asserts! (< block-height (var-get emergency-team-sunset-height)) err-sunset-height-reached)
-		(contract-call? .ede001-proposal-voting add-proposal proposal
+		(contract-call? .sde001-proposal-voting add-proposal proposal
 			{
 				start-block-height: block-height,
 				end-block-height: (+ block-height (var-get emergency-proposal-duration)),

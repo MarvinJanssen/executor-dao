@@ -1,4 +1,4 @@
-;; Title: EDE006 DAO Members
+;; Title: SDE006 DAO Membership
 ;; Author: Ryan Waits
 ;; Depends-On: 
 ;; Synopsis:
@@ -9,12 +9,12 @@
 (impl-trait .extension-trait.extension-trait)
 (use-trait proposal-trait .proposal-trait.proposal-trait)
 
-(define-constant err-unauthorised (err u3000))
-(define-constant err-not-a-member (err u3001))
+(define-constant err-unauthorised (err u2900))
+(define-constant err-not-a-member (err u2901))
 
 (define-map members principal bool)
 
-;; --- Authorisation check
+;; --- Authorization check
 
 (define-public (is-dao-or-extension)
   (ok (asserts! (or (is-eq tx-sender .executor-dao) (contract-call? .executor-dao is-extension contract-caller)) err-unauthorised))

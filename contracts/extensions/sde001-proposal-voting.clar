@@ -1,6 +1,6 @@
-;; Title: EDE001 Proposal Voting
+;; Title: SDE001 Proposal Voting
 ;; Author: Marvin Janssen
-;; Depends-On: EDE000
+;; Depends-On: SDE000
 ;; Synopsis:
 ;; This extension is part of the core of ExecutorDAO. It allows governance token
 ;; holders to vote on and conclude proposals.
@@ -15,19 +15,19 @@
 (use-trait proposal-trait .proposal-trait.proposal-trait)
 (use-trait governance-token-trait .governance-token-trait.governance-token-trait)
 
-(define-constant err-unauthorised (err u3000))
-(define-constant err-not-governance-token (err u3001))
-(define-constant err-proposal-already-executed (err u3002))
-(define-constant err-proposal-already-exists (err u3003))
-(define-constant err-unknown-proposal (err u3004))
-(define-constant err-proposal-already-concluded (err u3005))
-(define-constant err-proposal-inactive (err u3006))
-(define-constant err-proposal-not-concluded (err u3007))
-(define-constant err-no-votes-to-return (err u3008))
-(define-constant err-end-block-height-not-reached (err u3009))
-(define-constant err-disabled (err u3010))
+(define-constant err-unauthorised (err u2500))
+(define-constant err-not-governance-token (err u2501))
+(define-constant err-proposal-already-executed (err u2502))
+(define-constant err-proposal-already-exists (err u2503))
+(define-constant err-unknown-proposal (err u2504))
+(define-constant err-proposal-already-concluded (err u2505))
+(define-constant err-proposal-inactive (err u2506))
+(define-constant err-proposal-not-concluded (err u2507))
+(define-constant err-no-votes-to-return (err u2508))
+(define-constant err-end-block-height-not-reached (err u2509))
+(define-constant err-disabled (err u2510))
 
-(define-data-var governance-token-principal principal .ede000-governance-token)
+(define-data-var governance-token-principal principal .sde000-governance-token)
 
 (define-map proposals
 	principal
@@ -44,7 +44,7 @@
 
 (define-map member-total-votes {proposal: principal, voter: principal, governance-token: principal} uint)
 
-;; --- Authorisation check
+;; --- Authorization check
 
 (define-public (is-dao-or-extension)
 	(ok (asserts! (or (is-eq tx-sender .executor-dao) (contract-call? .executor-dao is-extension contract-caller)) err-unauthorised))
@@ -115,7 +115,7 @@
 			)
 		)
 		(print {event: "vote", proposal: proposal, voter: tx-sender, for: for, amount: amount})
-		(contract-call? governance-token edg-lock amount tx-sender)
+		(contract-call? governance-token sdg-lock amount tx-sender)
 	)
 )
 
@@ -148,7 +148,7 @@
 		)
 		(asserts! (get concluded proposal-data) err-proposal-not-concluded)
 		(map-delete member-total-votes {proposal: proposal-principal, voter: tx-sender, governance-token: token-principal})
-		(contract-call? governance-token edg-unlock votes tx-sender)
+		(contract-call? governance-token sdg-unlock votes tx-sender)
 	)
 )
 

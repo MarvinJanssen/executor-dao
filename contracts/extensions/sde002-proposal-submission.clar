@@ -1,6 +1,6 @@
-;; Title: EDE002 Proposal Submission
+;; Title: SDE002 Proposal Submission
 ;; Author: Marvin Janssen
-;; Depends-On: EDE001
+;; Depends-On: SDE001
 ;; Synopsis:
 ;; This extension part of the core of ExecutorDAO. It allows governance token
 ;; holders to submit proposals when they hold at least n% percentage of the
@@ -16,14 +16,14 @@
 (use-trait proposal-trait .proposal-trait.proposal-trait)
 (use-trait governance-token-trait .governance-token-trait.governance-token-trait)
 
-(define-constant err-unauthorised (err u3100))
-(define-constant err-not-governance-token (err u3101))
-(define-constant err-insufficient-balance (err u3102))
-(define-constant err-unknown-parameter (err u3103))
-(define-constant err-proposal-minimum-start-delay (err u3104))
-(define-constant err-proposal-maximum-start-delay (err u3105))
+(define-constant err-unauthorised (err u2600))
+(define-constant err-not-governance-token (err u2601))
+(define-constant err-insufficient-balance (err u2602))
+(define-constant err-unknown-parameter (err u2603))
+(define-constant err-proposal-minimum-start-delay (err u2604))
+(define-constant err-proposal-maximum-start-delay (err u2605))
 
-(define-data-var governance-token-principal principal .ede000-governance-token)
+(define-data-var governance-token-principal principal .sde000-governance-token)
 
 (define-map parameters (string-ascii 34) uint)
 
@@ -32,7 +32,7 @@
 (map-set parameters "minimum-proposal-start-delay" u144) ;; ~1 day minimum delay before voting on a proposal can start.
 (map-set parameters "maximum-proposal-start-delay" u1008) ;; ~7 days maximum delay before voting on a proposal can start.
 
-;; --- Authorisation check
+;; --- Authorization check
 
 (define-public (is-dao-or-extension)
 	(ok (asserts! (or (is-eq tx-sender .executor-dao) (contract-call? .executor-dao is-extension contract-caller)) err-unauthorised))
@@ -99,8 +99,8 @@
 		(try! (is-governance-token governance-token))
 		(asserts! (>= start-block-height (+ block-height (try! (get-parameter "minimum-proposal-start-delay")))) err-proposal-minimum-start-delay)
 		(asserts! (<= start-block-height (+ block-height (try! (get-parameter "maximum-proposal-start-delay")))) err-proposal-maximum-start-delay)
-		(asserts! (try! (contract-call? governance-token edg-has-percentage-balance tx-sender (try! (get-parameter "propose-factor")))) err-insufficient-balance)
-		(contract-call? .ede001-proposal-voting add-proposal
+		(asserts! (try! (contract-call? governance-token sdg-has-percentage-balance tx-sender (try! (get-parameter "propose-factor")))) err-insufficient-balance)
+		(contract-call? .sde001-proposal-voting add-proposal
 			proposal
 			{
 				start-block-height: start-block-height,
