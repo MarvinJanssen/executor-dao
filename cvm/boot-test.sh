@@ -20,7 +20,7 @@ for contract in "${deploy_order[@]}"; do
 	echo "LAUNCH $contract"
 	clarity-cli launch "$deployer.$(basename $contract .clar)" "../contracts/$contract" "$vmstate"
 done
-echo "INITIALIZE"
+echo "CREATE"
 result=$(clarity-cli execute "$vmstate" "$deployer.executor-dao" "construct" "$deployer" "'$deployer.sdp000-bootstrap")
 if [[ $(echo $result | jq ".success") == "true" ]]; then
 	echo "OK"

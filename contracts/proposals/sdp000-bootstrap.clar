@@ -1,5 +1,6 @@
-;; Title: SDP000 Initialize
-;; Author: Marvin Janssen
+;; Title: SDP000 Create
+;; Original Author: Marvin Janssen
+;; Maintaining Author: Ryan Waits
 ;; Synopsis:
 ;; Boot proposal that sets the governance token, DAO parameters, and extensions, and
 ;; mints the initial governance tokens.
@@ -21,7 +22,7 @@
 				{extension: .sde006-membership, enabled: true}
 				{extension: .sde007-membership-proposal-voting, enabled: true}
 				{extension: .sde008-membership-proposal-submission, enabled: true}
-				{extension: .sde009-vault, enabled: true}
+				{extension: .sde009-safe, enabled: true}
 			)
 		))
 
@@ -34,9 +35,9 @@
 		(try! (contract-call? .sde004-emergency-execute set-executive-team-member 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5 true))
 		(try! (contract-call? .sde004-emergency-execute set-executive-team-member 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG true))
 		(try! (contract-call? .sde004-emergency-execute set-executive-team-member 'ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC true))
-		(try! (contract-call? .sde004-emergency-execute set-signals-required u3)) ;; signal from 3 out of 4 team members requied.
+		(try! (contract-call? .sde004-emergency-execute set-signals-required u3)) ;; signal from 3 out of 4 team members required.
 
-		;; Add initial DAO members
+		;; Add initial DAO members.
 		(try! (contract-call? .sde006-membership set-member 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM true))
 		(try! (contract-call? .sde006-membership set-member 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5 true))
 		(try! (contract-call? .sde006-membership set-member 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG true))

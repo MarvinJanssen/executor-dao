@@ -1,21 +1,21 @@
 ;; StackerDAOs
-;; Forked from ExecutorDAO
+;; --- Forked from ExecutorDAO
 
 (use-trait proposal-trait .proposal-trait.proposal-trait)
 (use-trait extension-trait .extension-trait.extension-trait)
 
-(define-constant err-unauthorised (err u1000))
-(define-constant err-already-executed (err u1001))
-(define-constant err-invalid-extension (err u1002))
+(define-constant ERR_UNAUTHORIZED (err u1000))
+(define-constant ERR_ALREADY_EXECUTED (err u1001))
+(define-constant ERR_INVALID_EXTENSION (err u1002))
 
 (define-data-var executive principal tx-sender)
-(define-map executed-proposals principal uint)
+(define-map ExecutedProposals principal uint)
 (define-map extensions principal bool)
 
 ;; --- Authorization check
 
 (define-private (is-self-or-extension)
-	(ok (asserts! (or (is-eq tx-sender (as-contract tx-sender)) (is-extension contract-caller)) err-unauthorised))
+	(ok (asserts! (or (is-eq tx-sender (as-contract tx-sender)) (is-extension contract-caller)) ERR_UNAUTHORIZED))
 )
 
 ;; --- Extensions
@@ -39,23 +39,23 @@
 	)
 )
 
-(define-public (set-extensions (extension-list (list 200 {extension: principal, enabled: bool})))
+(define-public (set-extensions (extensionList (list 200 {extension: principal, enabled: bool})))
 	(begin
 		(try! (is-self-or-extension))
-		(ok (map set-extensions-iter extension-list))
+		(ok (map set-extensions-iter extensionList))
 	)
 )
 
 ;; --- Proposals
 
 (define-read-only (executed-at (proposal <proposal-trait>))
-	(map-get? executed-proposals (contract-of proposal))
+	(map-get? ExecutedProposals (contract-of proposal))
 )
 
 (define-public (execute (proposal <proposal-trait>) (sender principal))
 	(begin
 		(try! (is-self-or-extension))
-		(asserts! (map-insert executed-proposals (contract-of proposal) block-height) err-already-executed)
+		(asserts! (map-insert ExecutedProposals (contract-of proposal) block-height) ERR_ALREADY_EXECUTED)
 		(print {event: "execute", proposal: proposal})
 		(as-contract (contract-call? proposal execute sender))
 	)
@@ -63,9 +63,9 @@
 
 ;; --- Initial DAO setup with extensions, members, team members, and executive members
 
-(define-public (initialize (proposal <proposal-trait>))
+(define-public (create (proposal <proposal-trait>))
 	(let ((sender tx-sender))
-		(asserts! (is-eq sender (var-get executive)) err-unauthorised)
+		(asserts! (is-eq sender (var-get executive)) ERR_UNAUTHORIZED)
 		(var-set executive (as-contract tx-sender))
 		(as-contract (execute proposal sender))
 	)
@@ -75,8 +75,8 @@
 
 (define-public (request-extension-callback (extension <extension-trait>) (memo (buff 34)))
 	(let ((sender tx-sender))
-		(asserts! (is-extension contract-caller) err-invalid-extension)
-		(asserts! (is-eq contract-caller (contract-of extension)) err-invalid-extension)
+		(asserts! (is-extension contract-caller) ERR_INVALID_EXTENSION)
+		(asserts! (is-eq contract-caller (contract-of extension)) ERR_INVALID_EXTENSION)
 		(as-contract (contract-call? extension callback sender memo))
 	)
 )

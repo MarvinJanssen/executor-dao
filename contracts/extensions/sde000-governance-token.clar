@@ -1,32 +1,33 @@
 ;; Title: SDE000 Governance Token
-;; Author: Marvin Janssen
+;; Original Author: Marvin Janssen
+;; Maintaining Author: Ryan Waits
 ;; Depends-On: 
 ;; Synopsis:
-;; This extension defines the governance token of ExecutorDAO.
+;; This extension defines the governance token of StackerDAO.
 ;; Description:
 ;; The governance token is a simple SIP010-compliant fungible token
 ;; with some added functions to make it easier to manage by
-;; ExecutorDAO proposals and extensions.
+;; StackerDAO proposals and extensions.
 
 (impl-trait .governance-token-trait.governance-token-trait)
 (impl-trait .sip010-ft-trait.sip010-ft-trait)
 (impl-trait .extension-trait.extension-trait)
 
-(define-constant err-unauthorised (err u2400))
-(define-constant err-not-token-owner (err u4))
+(define-constant ERR_UNAUTHORIZED (err u2400))
+(define-constant ERR_NOT_TOKEN_OWNER (err u4))
 
-(define-fungible-token stacker-dao-token)
-(define-fungible-token stacker-dao-token-locked)
+(define-fungible-token Stacker-DAO-Token)
+(define-fungible-token Stacker-DAO-Token-Locked)
 
-(define-data-var token-name (string-ascii 32) "StackerDAO Governance Token")
-(define-data-var token-symbol (string-ascii 10) "SDG")
-(define-data-var token-uri (optional (string-utf8 256)) none)
-(define-data-var token-decimals uint u6)
+(define-data-var tokenName (string-ascii 32) "StackerDAO Governance Token")
+(define-data-var tokenSymbol (string-ascii 10) "SDG")
+(define-data-var tokenUri (optional (string-utf8 256)) none)
+(define-data-var tokenDecimals uint u6)
 
 ;; --- Authorization check
 
 (define-public (is-dao-or-extension)
-	(ok (asserts! (or (is-eq tx-sender .executor-dao) (contract-call? .executor-dao is-extension contract-caller)) err-unauthorised))
+	(ok (asserts! (or (is-eq tx-sender .executor-dao) (contract-call? .executor-dao is-extension contract-caller)) ERR_UNAUTHORIZED))
 )
 
 ;; --- Internal DAO functions
@@ -36,72 +37,72 @@
 (define-public (sdg-transfer (amount uint) (sender principal) (recipient principal))
 	(begin
 		(try! (is-dao-or-extension))
-		(ft-transfer? stacker-dao-token amount sender recipient)
+		(ft-transfer? Stacker-DAO-Token amount sender recipient)
 	)
 )
 
 (define-public (sdg-lock (amount uint) (owner principal))
 	(begin
 		(try! (is-dao-or-extension))
-		(try! (ft-burn? stacker-dao-token amount owner))
-		(ft-mint? stacker-dao-token-locked amount owner)
+		(try! (ft-burn? Stacker-DAO-Token amount owner))
+		(ft-mint? Stacker-DAO-Token-Locked amount owner)
 	)
 )
 
 (define-public (sdg-unlock (amount uint) (owner principal))
 	(begin
 		(try! (is-dao-or-extension))
-		(try! (ft-burn? stacker-dao-token-locked amount owner))
-		(ft-mint? stacker-dao-token amount owner)
+		(try! (ft-burn? Stacker-DAO-Token-Locked amount owner))
+		(ft-mint? Stacker-DAO-Token amount owner)
 	)
 )
 
 (define-public (sdg-mint (amount uint) (recipient principal))
 	(begin
 		(try! (is-dao-or-extension))
-		(ft-mint? stacker-dao-token amount recipient)
+		(ft-mint? Stacker-DAO-Token amount recipient)
 	)
 )
 
 (define-public (sdg-burn (amount uint) (owner principal))
 	(begin
 		(try! (is-dao-or-extension))
-		(ft-burn? stacker-dao-token amount owner)
+		(ft-burn? Stacker-DAO-Token amount owner)
 	)
 )
 
 ;; Other
 
-(define-public (set-name (new-name (string-ascii 32)))
+(define-public (set-name (newName (string-ascii 32)))
 	(begin
 		(try! (is-dao-or-extension))
-		(ok (var-set token-name new-name))
+		(ok (var-set tokenName newName))
 	)
 )
 
-(define-public (set-symbol (new-symbol (string-ascii 10)))
+(define-public (set-symbol (newSymbol (string-ascii 10)))
 	(begin
 		(try! (is-dao-or-extension))
-		(ok (var-set token-symbol new-symbol))
+		(ok (var-set tokenSymbol newSymbol))
 	)
 )
 
-(define-public (set-decimals (new-decimals uint))
+(define-public (set-decimals (newDecimals uint))
 	(begin
 		(try! (is-dao-or-extension))
-		(ok (var-set token-decimals new-decimals))
+		(ok (var-set tokenDecimals newDecimals))
 	)
 )
 
-(define-public (set-token-uri (new-uri (optional (string-utf8 256))))
+(define-public (set-tokenUri (newUri (optional (string-utf8 256))))
 	(begin
 		(try! (is-dao-or-extension))
-		(ok (var-set token-uri new-uri))
+		(ok (var-set tokenUri newUri))
 	)
 )
 
 (define-private (sdg-mint-many-iter (item {amount: uint, recipient: principal}))
-	(ft-mint? stacker-dao-token (get amount item) (get recipient item))
+	(ft-mint? Stacker-DAO-Token (get amount item) (get recipient item))
 )
 
 (define-public (sdg-mint-many (recipients (list 200 {amount: uint, recipient: principal})))
@@ -117,33 +118,33 @@
 
 (define-public (transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))
 	(begin
-		(asserts! (or (is-eq tx-sender sender) (is-eq contract-caller sender)) err-not-token-owner)
-		(ft-transfer? stacker-dao-token amount sender recipient)
+		(asserts! (or (is-eq tx-sender sender) (is-eq contract-caller sender)) ERR_NOT_TOKEN_OWNER)
+		(ft-transfer? Stacker-DAO-Token amount sender recipient)
 	)
 )
 
 (define-read-only (get-name)
-	(ok (var-get token-name))
+	(ok (var-get tokenName))
 )
 
 (define-read-only (get-symbol)
-	(ok (var-get token-symbol))
+	(ok (var-get tokenSymbol))
 )
 
 (define-read-only (get-decimals)
-	(ok (var-get token-decimals))
+	(ok (var-get tokenDecimals))
 )
 
 (define-read-only (get-balance (who principal))
-	(ok (+ (ft-get-balance stacker-dao-token who) (ft-get-balance stacker-dao-token-locked who)))
+	(ok (+ (ft-get-balance Stacker-DAO-Token who) (ft-get-balance Stacker-DAO-Token-Locked who)))
 )
 
 (define-read-only (get-total-supply)
-	(ok (+ (ft-get-supply stacker-dao-token) (ft-get-supply stacker-dao-token-locked)))
+	(ok (+ (ft-get-supply Stacker-DAO-Token) (ft-get-supply Stacker-DAO-Token-Locked)))
 )
 
-(define-read-only (get-token-uri)
-	(ok (var-get token-uri))
+(define-read-only (get-tokenUri)
+	(ok (var-get tokenUri))
 )
 
 ;; governance-token-trait
@@ -157,7 +158,7 @@
 )
 
 (define-read-only (sdg-get-locked (owner principal))
-	(ok (ft-get-balance stacker-dao-token-locked owner))
+	(ok (ft-get-balance Stacker-DAO-Token-Locked owner))
 )
 
 ;; --- Extension callback

@@ -29,7 +29,7 @@ depends_on = ["executor-dao", "extension-trait", "sde000-governance-token"]
 
 [contracts.sde006-membership]
 path = "contracts/extensions/sde006-membership.clar"
-depends_on = ["executor-dao", "extension-trait"]
+depends_on = ["executor-dao", "member-trait", "extension-trait"]
 
 [contracts.sde007-membership-proposal-voting]
 path = "contracts/extensions/sde007-membership-proposal-voting.clar"
@@ -39,13 +39,13 @@ depends_on = ["executor-dao", "proposal-trait", "extension-trait", "member-trait
 path = "contracts/extensions/sde008-membership-proposal-submission.clar"
 depends_on = ["executor-dao", "extension-trait", "sde007-membership-proposal-voting"]
 
-[contracts.sde009-vault]
-path = "contracts/extensions/sde009-vault.clar"
+[contracts.sde009-safe]
+path = "contracts/extensions/sde009-safe.clar"
 depends_on = ["executor-dao", "extension-trait", "sip009-nft-trait", "sip010-ft-trait"]
 
 [contracts.sdp000-bootstrap]
 path = "contracts/proposals/sdp000-bootstrap.clar"
-depends_on = ["executor-dao", "proposal-trait", "extension-trait", "sde000-governance-token", "sde001-proposal-voting", "sde002-proposal-submission", "sde003-emergency-proposals", "sde004-emergency-execute", "sde006-membership", "sde007-membership-proposal-voting", "sde008-membership-proposal-submission", "sde009-vault"]
+depends_on = ["executor-dao", "proposal-trait", "extension-trait", "sde000-governance-token", "sde001-proposal-voting", "sde002-proposal-submission", "sde003-emergency-proposals", "sde004-emergency-execute", "sde006-membership", "sde007-membership-proposal-voting", "sde008-membership-proposal-submission", "sde009-safe"]
 
 [contracts.sdp001-dev-fund]
 path = "contracts/proposals/sdp001-dev-fund.clar"
@@ -61,6 +61,10 @@ depends_on = ["proposal-trait", "nft-escrow"]
 
 [contracts.sdp004-send-funds]
 path = "contracts/proposals/sdp004-send-funds.clar"
+depends_on = ["proposal-trait"]
+
+[contracts.sdp005-disable-emergency-proposal]
+path = "contracts/proposals/sdp005-disable-emergency-proposal.clar"
 depends_on = ["proposal-trait"]
 
 [contracts.executor-dao]

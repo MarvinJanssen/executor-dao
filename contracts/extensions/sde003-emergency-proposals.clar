@@ -1,5 +1,6 @@
 ;; Title: SDE003 Emergency Proposals
-;; Author: Marvin Janssen
+;; Original Author: Marvin Janssen
+;; Maintaining Author: Ryan Waits
 ;; Depends-On: SDE001
 ;; Synopsis:
 ;; This extension allows for the creation of emergency proposals by a few trusted
@@ -12,23 +13,24 @@
 ;; proposals can be made. The emergency team members, sunset period, and 
 ;; emergency vote duration can be changed by means of a future proposal.
 
-(impl-trait .extension-trait.extension-trait)
 (use-trait proposal-trait .proposal-trait.proposal-trait)
 
-(define-data-var emergency-proposal-duration uint u144) ;; ~1 day
-(define-data-var emergency-team-sunset-height uint (+ block-height u13140)) ;; ~3 months from deploy time
+(impl-trait .extension-trait.extension-trait)
 
-(define-constant err-unauthorised (err u2700))
-(define-constant err-not-emergency-team-member (err u2701))
-(define-constant err-sunset-height-reached (err u2702))
-(define-constant err-sunset-height-in-past (err u2703))
+(define-constant ERR_UNAUTHORIZED (err u2700))
+(define-constant ERR_NOT_EMERGENCY_TEAM_MEMBER (err u2701))
+(define-constant ERR_SUNSET_HEIGHT_REACHED (err u2702))
+(define-constant ERR_SUNSET_HEIGHT_IN_PAST (err u2703))
 
-(define-map emergency-team principal bool)
+(define-data-var emergencyProposalDuration uint u144) ;; ~1 day
+(define-data-var emergencyTeamSunsetHeight uint (+ block-height u13140)) ;; ~3 months from deploy time
+
+(define-map EmergencyTeam principal bool)
 
 ;; --- Authorization check
 
 (define-public (is-dao-or-extension)
-	(ok (asserts! (or (is-eq tx-sender .executor-dao) (contract-call? .executor-dao is-extension contract-caller)) err-unauthorised))
+	(ok (asserts! (or (is-eq tx-sender .executor-dao) (contract-call? .executor-dao is-extension contract-caller)) ERR_UNAUTHORIZED))
 )
 
 ;; --- Internal DAO functions
@@ -36,39 +38,39 @@
 (define-public (set-emergency-proposal-duration (duration uint))
 	(begin
 		(try! (is-dao-or-extension))
-		(ok (var-set emergency-proposal-duration duration))
+		(ok (var-set emergencyProposalDuration duration))
 	)
 )
 
 (define-public (set-emergency-team-sunset-height (height uint))
 	(begin
 		(try! (is-dao-or-extension))
-		(asserts! (> height block-height) err-sunset-height-in-past)
-		(ok (var-set emergency-team-sunset-height height))
+		(asserts! (> height block-height) ERR_SUNSET_HEIGHT_IN_PAST)
+		(ok (var-set emergencyTeamSunsetHeight height))
 	)
 )
 
 (define-public (set-emergency-team-member (who principal) (member bool))
 	(begin
 		(try! (is-dao-or-extension))
-		(ok (map-set emergency-team who member))
+		(ok (map-set EmergencyTeam who member))
 	)
 )
 
 ;; --- Public functions
 
 (define-read-only (is-emergency-team-member (who principal))
-	(default-to false (map-get? emergency-team who))
+	(default-to false (map-get? EmergencyTeam who))
 )
 
 (define-public (emergency-propose (proposal <proposal-trait>))
 	(begin
-		(asserts! (is-emergency-team-member tx-sender) err-not-emergency-team-member)
-		(asserts! (< block-height (var-get emergency-team-sunset-height)) err-sunset-height-reached)
+		(asserts! (is-emergency-team-member tx-sender) ERR_NOT_EMERGENCY_TEAM_MEMBER)
+		(asserts! (< block-height (var-get emergencyTeamSunsetHeight)) ERR_SUNSET_HEIGHT_REACHED)
 		(contract-call? .sde001-proposal-voting add-proposal proposal
 			{
-				start-block-height: block-height,
-				end-block-height: (+ block-height (var-get emergency-proposal-duration)),
+				startBlockHeight: block-height,
+				endBlockHeight: (+ block-height (var-get emergencyProposalDuration)),
 				proposer: tx-sender
 			}
 		)

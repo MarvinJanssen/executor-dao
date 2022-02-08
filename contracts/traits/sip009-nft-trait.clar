@@ -4,7 +4,7 @@
     (get-last-token-id () (response uint uint))
 
     ;; URI for metadata associated with the token
-    (get-token-uri (uint) (response (optional (string-ascii 256)) uint))
+    (get-tokenUri (uint) (response (optional (string-ascii 256)) uint))
 
      ;; Owner of a given token identifier
     (get-owner (uint) (response (optional principal) uint))

@@ -1,8 +1,9 @@
 ;; Title: SDE001 Proposal Voting
-;; Author: Marvin Janssen
+;; Original Author: Marvin Janssen
+;; Maintaining Author: Ryan Waits
 ;; Depends-On: SDE000
 ;; Synopsis:
-;; This extension is part of the core of ExecutorDAO. It allows governance token
+;; This extension is part of the core of StackerDAO. It allows governance token
 ;; holders to vote on and conclude proposals.
 ;; Description:
 ;; Once proposals are submitted, they are open for voting after a lead up time
@@ -15,60 +16,60 @@
 (use-trait proposal-trait .proposal-trait.proposal-trait)
 (use-trait governance-token-trait .governance-token-trait.governance-token-trait)
 
-(define-constant err-unauthorised (err u2500))
-(define-constant err-not-governance-token (err u2501))
-(define-constant err-proposal-already-executed (err u2502))
-(define-constant err-proposal-already-exists (err u2503))
-(define-constant err-unknown-proposal (err u2504))
-(define-constant err-proposal-already-concluded (err u2505))
-(define-constant err-proposal-inactive (err u2506))
-(define-constant err-proposal-not-concluded (err u2507))
-(define-constant err-no-votes-to-return (err u2508))
-(define-constant err-end-block-height-not-reached (err u2509))
-(define-constant err-disabled (err u2510))
+(define-constant ERR_UNAUTHORIZED (err u2500))
+(define-constant ERR_NOT_GOVERNANCE_TOKEN (err u2501))
+(define-constant ERR_PROPOSAL_ALREADY_EXECUTED (err u2502))
+(define-constant ERR_PROPOSAL_ALREADY_EXISTS (err u2503))
+(define-constant ERR_UNKNOWN_PROPOSAL (err u2504))
+(define-constant ERR_PROPOSAL_ALREADY_CONCLUDED (err u2505))
+(define-constant ERR_PROPOSAL_INACTIVE (err u2506))
+(define-constant ERR_PROPOSAL_NOT_CONCLUDED (err u2507))
+(define-constant ERR_NO_VOTES_TO_RETURN (err u2508))
+(define-constant ERR_END_BLOCK_HEIGHT_NOT_REACHED (err u2509))
+(define-constant ERR_DISABLED (err u2510))
 
-(define-data-var governance-token-principal principal .sde000-governance-token)
+(define-data-var governanceTokenPrincipal principal .sde000-governance-token)
 
-(define-map proposals
+(define-map Proposals
 	principal
 	{
-		votes-for: uint,
-		votes-against: uint,
-		start-block-height: uint,
-		end-block-height: uint,
+		votesFor: uint,
+		votesAgainst: uint,
+		startBlockHeight: uint,
+		endBlockHeight: uint,
 		concluded: bool,
 		passed: bool,
 		proposer: principal
 	}
 )
 
-(define-map member-total-votes {proposal: principal, voter: principal, governance-token: principal} uint)
+(define-map MemberTotalVotes {proposal: principal, voter: principal, governanceToken: principal} uint)
 
 ;; --- Authorization check
 
 (define-public (is-dao-or-extension)
-	(ok (asserts! (or (is-eq tx-sender .executor-dao) (contract-call? .executor-dao is-extension contract-caller)) err-unauthorised))
+	(ok (asserts! (or (is-eq tx-sender .executor-dao) (contract-call? .executor-dao is-extension contract-caller)) ERR_UNAUTHORIZED))
 )
 
 ;; --- Internal DAO functions
 
 ;; Governance token
 
-(define-public (set-governance-token (governance-token <governance-token-trait>))
+(define-public (set-governance-token (governanceToken <governance-token-trait>))
 	(begin
 		(try! (is-dao-or-extension))
-		(ok (var-set governance-token-principal (contract-of governance-token)))
+		(ok (var-set governanceTokenPrincipal (contract-of governanceToken)))
 	)
 )
 
 ;; Proposals
 
-(define-public (add-proposal (proposal <proposal-trait>) (data {start-block-height: uint, end-block-height: uint, proposer: principal}))
+(define-public (add-proposal (proposal <proposal-trait>) (data {startBlockHeight: uint, endBlockHeight: uint, proposer: principal}))
 	(begin
 		(try! (is-dao-or-extension))
-		(asserts! (is-none (contract-call? .executor-dao executed-at proposal)) err-proposal-already-executed)
+		(asserts! (is-none (contract-call? .executor-dao executed-at proposal)) ERR_PROPOSAL_ALREADY_EXECUTED)
 		(print {event: "propose", proposal: proposal, proposer: tx-sender})
-		(ok (asserts! (map-insert proposals (contract-of proposal) (merge {votes-for: u0, votes-against: u0, concluded: false, passed: false} data)) err-proposal-already-exists))
+		(ok (asserts! (map-insert Proposals (contract-of proposal) (merge {votesFor: u0, votesAgainst: u0, concluded: false, passed: false} data)) ERR_PROPOSAL_ALREADY_EXISTS))
 	)
 )
 
@@ -77,45 +78,45 @@
 ;; Governance token
 
 (define-read-only (get-governance-token)
-	(var-get governance-token-principal)
+	(var-get governanceTokenPrincipal)
 )
 
-(define-private (is-governance-token (governance-token <governance-token-trait>))
-	(ok (asserts! (is-eq (contract-of governance-token) (var-get governance-token-principal)) err-not-governance-token))
+(define-private (is-governance-token (governanceToken <governance-token-trait>))
+	(ok (asserts! (is-eq (contract-of governanceToken) (var-get governanceTokenPrincipal)) ERR_NOT_GOVERNANCE_TOKEN))
 )
 
 ;; Proposals
 
-(define-read-only (get-proposal-data (proposal principal))
-	(map-get? proposals proposal)
+(define-read-only (get-proposalData (proposal principal))
+	(map-get? Proposals proposal)
 )
 
 ;; Votes
 
-(define-read-only (get-current-total-votes (proposal principal) (voter principal) (governance-token principal))
-	(default-to u0 (map-get? member-total-votes {proposal: proposal, voter: voter, governance-token: governance-token}))
+(define-read-only (get-current-total-votes (proposal principal) (voter principal) (governanceToken principal))
+	(default-to u0 (map-get? MemberTotalVotes {proposal: proposal, voter: voter, governanceToken: governanceToken}))
 )
 
-(define-public (vote (amount uint) (for bool) (proposal principal) (governance-token <governance-token-trait>))
+(define-public (vote (amount uint) (for bool) (proposal principal) (governanceToken <governance-token-trait>))
 	(let
 		(
-			(proposal-data (unwrap! (map-get? proposals proposal) err-unknown-proposal))
-			(token-principal (contract-of governance-token))
+			(proposalData (unwrap! (map-get? Proposals proposal) ERR_UNKNOWN_PROPOSAL))
+			(tokenPrincipal (contract-of governanceToken))
 		)
-		(try! (is-governance-token governance-token))
-		(asserts! (>= block-height (get start-block-height proposal-data)) err-proposal-inactive)
-		(asserts! (< block-height (get end-block-height proposal-data)) err-proposal-inactive)
-		(map-set member-total-votes {proposal: proposal, voter: tx-sender, governance-token: token-principal}
-			(+ (get-current-total-votes proposal tx-sender token-principal) amount)
+		(try! (is-governance-token governanceToken))
+		(asserts! (>= block-height (get startBlockHeight proposalData)) ERR_PROPOSAL_INACTIVE)
+		(asserts! (< block-height (get endBlockHeight proposalData)) ERR_PROPOSAL_INACTIVE)
+		(map-set MemberTotalVotes {proposal: proposal, voter: tx-sender, governanceToken: tokenPrincipal}
+			(+ (get-current-total-votes proposal tx-sender tokenPrincipal) amount)
 		)
-		(map-set proposals proposal
+		(map-set Proposals proposal
 			(if for
-				(merge proposal-data {votes-for: (+ (get votes-for proposal-data) amount)})
-				(merge proposal-data {votes-against: (+ (get votes-against proposal-data) amount)})
+				(merge proposalData {votesFor: (+ (get votesFor proposalData) amount)})
+				(merge proposalData {votesAgainst: (+ (get votesAgainst proposalData) amount)})
 			)
 		)
 		(print {event: "vote", proposal: proposal, voter: tx-sender, for: for, amount: amount})
-		(contract-call? governance-token sdg-lock amount tx-sender)
+		(contract-call? governanceToken sdg-lock amount tx-sender)
 	)
 )
 
@@ -124,12 +125,12 @@
 (define-public (conclude (proposal <proposal-trait>))
 	(let
 		(
-			(proposal-data (unwrap! (map-get? proposals (contract-of proposal)) err-unknown-proposal))
-			(passed (> (get votes-for proposal-data) (get votes-against proposal-data)))
+			(proposalData (unwrap! (map-get? Proposals (contract-of proposal)) ERR_UNKNOWN_PROPOSAL))
+			(passed (> (get votesFor proposalData) (get votesAgainst proposalData)))
 		)
-		(asserts! (not (get concluded proposal-data)) err-proposal-already-concluded)
-		(asserts! (>= block-height (get end-block-height proposal-data)) err-end-block-height-not-reached)
-		(map-set proposals (contract-of proposal) (merge proposal-data {concluded: true, passed: passed}))
+		(asserts! (not (get concluded proposalData)) ERR_PROPOSAL_ALREADY_CONCLUDED)
+		(asserts! (>= block-height (get endBlockHeight proposalData)) ERR_END_BLOCK_HEIGHT_NOT_REACHED)
+		(map-set Proposals (contract-of proposal) (merge proposalData {concluded: true, passed: passed}))
 		(print {event: "conclude", proposal: proposal, passed: passed})
 		(and passed (try! (contract-call? .executor-dao execute proposal tx-sender)))
 		(ok passed)
@@ -138,24 +139,24 @@
 
 ;; Reclamation
 
-(define-public (reclaim-votes (proposal <proposal-trait>) (governance-token <governance-token-trait>))
+(define-public (reclaim-votes (proposal <proposal-trait>) (governanceToken <governance-token-trait>))
 	(let
 		(
-			(proposal-principal (contract-of proposal))
-			(token-principal (contract-of governance-token))
-			(proposal-data (unwrap! (map-get? proposals proposal-principal) err-unknown-proposal))
-			(votes (unwrap! (map-get? member-total-votes {proposal: proposal-principal, voter: tx-sender, governance-token: token-principal}) err-no-votes-to-return))
+			(proposalPrincipal (contract-of proposal))
+			(tokenPrincipal (contract-of governanceToken))
+			(proposalData (unwrap! (map-get? Proposals proposalPrincipal) ERR_UNKNOWN_PROPOSAL))
+			(votes (unwrap! (map-get? MemberTotalVotes {proposal: proposalPrincipal, voter: tx-sender, governanceToken: tokenPrincipal}) ERR_NO_VOTES_TO_RETURN))
 		)
-		(asserts! (get concluded proposal-data) err-proposal-not-concluded)
-		(map-delete member-total-votes {proposal: proposal-principal, voter: tx-sender, governance-token: token-principal})
-		(contract-call? governance-token sdg-unlock votes tx-sender)
+		(asserts! (get concluded proposalData) ERR_PROPOSAL_NOT_CONCLUDED)
+		(map-delete MemberTotalVotes {proposal: proposalPrincipal, voter: tx-sender, governanceToken: tokenPrincipal})
+		(contract-call? governanceToken sdg-unlock votes tx-sender)
 	)
 )
 
-(define-public (reclaim-and-vote (amount uint) (for bool) (proposal principal) (reclaim-from <proposal-trait>) (governance-token <governance-token-trait>))
+(define-public (reclaim-and-vote (amount uint) (for bool) (proposal principal) (reclaim-from <proposal-trait>) (governanceToken <governance-token-trait>))
 	(begin
-		(try! (reclaim-votes reclaim-from governance-token))
-		(vote amount for proposal governance-token)
+		(try! (reclaim-votes reclaim-from governanceToken))
+		(vote amount for proposal governanceToken)
 	)
 )
 

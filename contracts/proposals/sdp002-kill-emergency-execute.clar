@@ -1,5 +1,6 @@
 ;; Title: SDP002 Kill Emergency Execute
-;; Author: Marvin Janssen
+;; Original Author: Marvin Janssen
+;; Maintaining Author: Ryan Waits
 ;; Synopsis:
 ;; This proposal disables extension "SDE004 Emergency Execute".
 ;; Description:

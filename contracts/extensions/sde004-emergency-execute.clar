@@ -1,5 +1,6 @@
 ;; Title: SDE004 Emergency Execute
-;; Author: Marvin Janssen
+;; Original Author: Marvin Janssen
+;; Maintaining Author: Ryan Waits
 ;; Depends-On: 
 ;; Synopsis:
 ;; This extension allows a small number of very trusted principals to immediately
@@ -17,11 +18,11 @@
 
 (define-data-var executive-team-sunset-height uint (+ block-height u4380)) ;; ~1 month from deploy time
 
-(define-constant err-unauthorised (err u2800))
+(define-constant ERR_UNAUTHORIZED (err u2800))
 (define-constant err-not-executive-team-member (err u2801))
 (define-constant err-already-executed (err u2802))
-(define-constant err-sunset-height-reached (err u2803))
-(define-constant err-sunset-height-in-past (err u2804))
+(define-constant ERR_SUNSET_HEIGHT_REACHED (err u2803))
+(define-constant ERR_SUNSET_HEIGHT_IN_PAST (err u2804))
 
 (define-map executive-team principal bool)
 (define-map executive-action-signals {proposal: principal, team-member: principal} bool)
@@ -32,7 +33,7 @@
 ;; --- Authorization check
 
 (define-public (is-dao-or-extension)
-	(ok (asserts! (or (is-eq tx-sender .executor-dao) (contract-call? .executor-dao is-extension contract-caller)) err-unauthorised))
+	(ok (asserts! (or (is-eq tx-sender .executor-dao) (contract-call? .executor-dao is-extension contract-caller)) ERR_UNAUTHORIZED))
 )
 
 ;; --- Internal DAO functions
@@ -40,7 +41,7 @@
 (define-public (set-executive-team-sunset-height (height uint))
 	(begin
 		(try! (is-dao-or-extension))
-		(asserts! (> height block-height) err-sunset-height-in-past)
+		(asserts! (> height block-height) ERR_SUNSET_HEIGHT_IN_PAST)
 		(ok (var-set executive-team-sunset-height height))
 	)
 )
@@ -80,16 +81,16 @@
 (define-public (executive-action (proposal <proposal-trait>))
 	(let
 		(
-			(proposal-principal (contract-of proposal))
-			(signals (+ (get-signals proposal-principal) (if (has-signalled proposal-principal tx-sender) u0 u1)))
+			(proposalPrincipal (contract-of proposal))
+			(signals (+ (get-signals proposalPrincipal) (if (has-signalled proposalPrincipal tx-sender) u0 u1)))
 		)
 		(asserts! (is-executive-team-member tx-sender) err-not-executive-team-member)
-		(asserts! (< block-height (var-get executive-team-sunset-height)) err-sunset-height-reached)
+		(asserts! (< block-height (var-get executive-team-sunset-height)) ERR_SUNSET_HEIGHT_REACHED)
 		(and (>= signals (var-get executive-signals-required))
 			(try! (contract-call? .executor-dao execute proposal tx-sender))
 		)
-		(map-set executive-action-signals {proposal: proposal-principal, team-member: tx-sender} true)
-		(map-set executive-action-signal-count proposal-principal signals)
+		(map-set executive-action-signals {proposal: proposalPrincipal, team-member: tx-sender} true)
+		(map-set executive-action-signal-count proposalPrincipal signals)
 		(ok signals)
 	)
 )

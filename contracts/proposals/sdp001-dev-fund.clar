@@ -1,5 +1,6 @@
 ;; Title: SDP001 Dev Fund
-;; Author: Marvin Janssen
+;; Original Author: Marvin Janssen
+;; Maintaining Author: Ryan Waits
 ;; Synopsis:
 ;; This proposal creates a simple dev fund that pays developers on a monthly basis.
 ;; Description:
@@ -12,13 +13,13 @@
 
 (impl-trait .proposal-trait.proposal-trait)
 
-(define-constant dev-fund-percentage u30)
+(define-constant DEV_FUND_PERCENTAGE u30)
 
 (define-public (execute (sender principal))
 	(let
 		(
-			(total-supply (unwrap-panic (contract-call? .sde000-governance-token get-total-supply)))
-			(dev-fund-amount (/ (* total-supply dev-fund-percentage) u100))
+			(totalSupply (unwrap-panic (contract-call? .sde000-governance-token get-total-supply)))
+			(devFundAmount (/ (* totalSupply DEV_FUND_PERCENTAGE) u100))
 		)
 		(try! (contract-call? .executor-dao set-extension .sde005-dev-fund true))
 		(try! (contract-call? .sde005-dev-fund set-allowance-start-height block-height))
@@ -26,6 +27,6 @@
 			{who: 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG, allowance: u100}
 			{who: 'ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC, allowance: u20}
 		)))
-		(contract-call? .sde000-governance-token sdg-mint dev-fund-amount .sde005-dev-fund)
+		(contract-call? .sde000-governance-token sdg-mint devFundAmount .sde005-dev-fund)
 	)
 )

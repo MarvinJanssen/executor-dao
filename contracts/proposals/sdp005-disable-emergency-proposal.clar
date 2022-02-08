@@ -1,4 +1,4 @@
-;; Title: SDP001 Dev Fund
+;; Title: SDP005 Disable Emergency Proposal
 ;; Original Author: Marvin Janssen
 ;; Maintaining Author: Ryan Waits
 ;; Synopsis:
@@ -13,18 +13,6 @@
 
 (impl-trait .proposal-trait.proposal-trait)
 
-(define-constant ERR_NOT_ENOUGH_FUNDS (err u2000))
-
-(define-constant percentage u30)
-
 (define-public (execute (sender principal))
-  (let
-    (
-      (currentBalance (stx-get-balance .sde009-safe))
-      (amount (/ (* currentBalance percentage) u100))
-    )
-    (asserts! (> currentBalance amount) ERR_NOT_ENOUGH_FUNDS)
-    ;; Send 30% of the current funds in the vault
-    (contract-call? .sde009-safe send-stx amount 'STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6)
-  )
+  (contract-call? .executor-dao set-extension .sde003-emergency-proposals false)
 )

@@ -1,8 +1,9 @@
 ;; Title: SDE002 Proposal Submission
-;; Author: Marvin Janssen
+;; Original Author: Marvin Janssen
+;; Maintaining Author: Ryan Waits
 ;; Depends-On: SDE001
 ;; Synopsis:
-;; This extension part of the core of ExecutorDAO. It allows governance token
+;; This extension part of the core of StackerDAO. It allows governance token
 ;; holders to submit proposals when they hold at least n% percentage of the
 ;; token supply.
 ;; Description:
@@ -16,7 +17,7 @@
 (use-trait proposal-trait .proposal-trait.proposal-trait)
 (use-trait member-trait .member-trait.member-trait)
 
-(define-constant err-unauthorised (err u3100))
+(define-constant ERR_UNAUTHORIZED (err u3100))
 (define-constant err-not-member-contract (err u3101))
 (define-constant err-unknown-parameter (err u3103))
 (define-constant err-proposal-minimum-start-delay (err u3104))
@@ -33,7 +34,7 @@
 ;; --- Authorization check
 
 (define-public (is-dao-or-extension)
-  (ok (asserts! (or (is-eq tx-sender .executor-dao) (contract-call? .executor-dao is-extension contract-caller)) err-unauthorised))
+  (ok (asserts! (or (is-eq tx-sender .executor-dao) (contract-call? .executor-dao is-extension contract-caller)) ERR_UNAUTHORIZED))
 )
 
 ;; --- Internal DAO functions
@@ -90,16 +91,16 @@
 
 ;; Proposals
 
-(define-public (propose (proposal <proposal-trait>) (start-block-height uint) (member-contract <member-trait>))
+(define-public (propose (proposal <proposal-trait>) (startBlockHeight uint) (member-contract <member-trait>))
   (begin
     (try! (is-member-contract member-contract))
-    (asserts! (>= start-block-height (+ block-height (try! (get-parameter "minimum-proposal-start-delay")))) err-proposal-minimum-start-delay)
-    (asserts! (<= start-block-height (+ block-height (try! (get-parameter "maximum-proposal-start-delay")))) err-proposal-maximum-start-delay)
+    (asserts! (>= startBlockHeight (+ block-height (try! (get-parameter "minimum-proposal-start-delay")))) err-proposal-minimum-start-delay)
+    (asserts! (<= startBlockHeight (+ block-height (try! (get-parameter "maximum-proposal-start-delay")))) err-proposal-maximum-start-delay)
     (contract-call? .sde007-membership-proposal-voting add-proposal
       proposal
       {
-        start-block-height: start-block-height,
-        end-block-height: (+ start-block-height (try! (get-parameter "proposal-duration"))),
+        startBlockHeight: startBlockHeight,
+        endBlockHeight: (+ startBlockHeight (try! (get-parameter "proposal-duration"))),
         proposer: tx-sender
       }
     )

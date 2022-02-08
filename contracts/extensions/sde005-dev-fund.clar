@@ -1,5 +1,6 @@
 ;; Title: SDE005 Dev Fund
-;; Author: Marvin Janssen
+;; Original Author: Marvin Janssen
+;; Maintaining Author: Ryan Waits
 ;; Depends-On: SDP000
 ;; Synopsis:
 ;; A simple pre-seeded dev fund that can pay out developers on a monthly basis.
@@ -12,7 +13,7 @@
 
 (define-constant one-month-time u4380) ;; 43,800 minutes / 10 minute average block time.
 
-(define-constant err-unauthorised (err u3000))
+(define-constant ERR_UNAUTHORIZED (err u3000))
 (define-constant err-no-allowance (err u3001))
 (define-constant err-already-claimed (err u3002))
 
@@ -24,7 +25,7 @@
 ;; --- Authorization check
 
 (define-public (is-dao-or-extension)
-	(ok (asserts! (or (is-eq tx-sender .executor-dao) (contract-call? .executor-dao is-extension contract-caller)) err-unauthorised))
+	(ok (asserts! (or (is-eq tx-sender .executor-dao) (contract-call? .executor-dao is-extension contract-caller)) ERR_UNAUTHORIZED))
 )
 
 ;; --- Internal DAO functions
@@ -80,7 +81,7 @@
 			(max-claims (/ (- block-height start-height) one-month-time))
 			(developer tx-sender)
 		)
-		(asserts! (> start-height u0) err-unauthorised)
+		(asserts! (> start-height u0) ERR_UNAUTHORIZED)
 		(asserts! (> allowance u0) err-no-allowance)
 		(asserts! (< claim-count max-claims) err-already-claimed)
 		(map-set claim-counts tx-sender max-claims)

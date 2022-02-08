@@ -13,7 +13,7 @@ The way a conventional company operates is defined in its constitution. Changes 
 
 ## 2. The core executes, the extensions give form
 
-StackerDAO initially consists of just one core contract. Its sole purpose is to execute proposals and to keep a list of authorised extensions. There are no other features: no token, no voting, no functions. The DAO is given form by means of so-called extension contracts. Extensions are contracts that can be enabled or disabled by proposals and add specific features to the DAO. They are allowed to assume the "sending context" of the DAO and can thus enact change. Since different groups and organisations have different needs, extensions are rather varied. Some example functionality that can be added to StackerDAO via an extension include:
+StackerDAO initially consists of just one core contract. Its sole purpose is to execute proposals and to keep a list of authorized extensions. There are no other features: no token, no voting, no functions. The DAO is given form by means of so-called extension contracts. Extensions are contracts that can be enabled or disabled by proposals and add specific features to the DAO. They are allowed to assume the "sending context" of the DAO and can thus enact change. Since different groups and organisations have different needs, extensions are rather varied. Some example functionality that can be added to StackerDAO via an extension include:
 
 - The issuance and management of a governance token.
 - The ability to submit proposals.
@@ -72,7 +72,7 @@ Allows whitelisted members to submit a proposal to be voted on via SDE007. Propo
 
 StackerDAOs also comes with some reference and example proposals. These are designated by a code that starts with "SDP" followed by an incrementing number of three digits. The numbers do not to coincide with extension numbering.
 
-### SDP000: Initialize
+### SDP000: Create
 
 An initializing proposal that is meant to be executed when the StackerDAO is first deployed. It initialises boot extensions, sets various parameters on them, and any additional configuration needed via the enabled extensions.
 
@@ -97,7 +97,7 @@ A simple example on how StackerDAO can send funds on behalf of the DAO.
 Unit tests coming soon, for now you can try it out manually in a `clarinet console` session. Execute the bootstrap proposal and have at it:
 
 ```clojure
-(contract-call? .executor-dao initialize .sdp000-bootstrap)
+(contract-call? .executor-dao create .sdp000-bootstrap)
 ```
 
 To propose `sdp004-send-funds`, run the following commands one by one:

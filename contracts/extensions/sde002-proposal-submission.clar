@@ -1,8 +1,9 @@
 ;; Title: SDE002 Proposal Submission
-;; Author: Marvin Janssen
+;; Original Author: Marvin Janssen
+;; Maintaining Author: Ryan Waits
 ;; Depends-On: SDE001
 ;; Synopsis:
-;; This extension part of the core of ExecutorDAO. It allows governance token
+;; This extension part of the core of StackerDAO. It allows governance token
 ;; holders to submit proposals when they hold at least n% percentage of the
 ;; token supply.
 ;; Description:
@@ -16,14 +17,14 @@
 (use-trait proposal-trait .proposal-trait.proposal-trait)
 (use-trait governance-token-trait .governance-token-trait.governance-token-trait)
 
-(define-constant err-unauthorised (err u2600))
-(define-constant err-not-governance-token (err u2601))
+(define-constant ERR_UNAUTHORIZED (err u2600))
+(define-constant ERR_NOT_GOVERNANCE_TOKEN (err u2601))
 (define-constant err-insufficient-balance (err u2602))
 (define-constant err-unknown-parameter (err u2603))
 (define-constant err-proposal-minimum-start-delay (err u2604))
 (define-constant err-proposal-maximum-start-delay (err u2605))
 
-(define-data-var governance-token-principal principal .sde000-governance-token)
+(define-data-var governanceTokenPrincipal principal .sde000-governance-token)
 
 (define-map parameters (string-ascii 34) uint)
 
@@ -35,7 +36,7 @@
 ;; --- Authorization check
 
 (define-public (is-dao-or-extension)
-	(ok (asserts! (or (is-eq tx-sender .executor-dao) (contract-call? .executor-dao is-extension contract-caller)) err-unauthorised))
+	(ok (asserts! (or (is-eq tx-sender .executor-dao) (contract-call? .executor-dao is-extension contract-caller)) ERR_UNAUTHORIZED))
 )
 
 ;; --- Internal DAO functions
@@ -45,7 +46,7 @@
 (define-public (set-governance-token (governance-token <governance-token-trait>))
 	(begin
 		(try! (is-dao-or-extension))
-		(ok (var-set governance-token-principal (contract-of governance-token)))
+		(ok (var-set governanceTokenPrincipal (contract-of governance-token)))
 	)
 )
 
@@ -79,11 +80,11 @@
 ;; Governance token
 
 (define-read-only (get-governance-token)
-	(var-get governance-token-principal)
+	(var-get governanceTokenPrincipal)
 )
 
 (define-private (is-governance-token (governance-token <governance-token-trait>))
-	(ok (asserts! (is-eq (contract-of governance-token) (var-get governance-token-principal)) err-not-governance-token))
+	(ok (asserts! (is-eq (contract-of governance-token) (var-get governanceTokenPrincipal)) ERR_NOT_GOVERNANCE_TOKEN))
 )
 
 ;; Parameters
@@ -94,17 +95,17 @@
 
 ;; Proposals
 
-(define-public (propose (proposal <proposal-trait>) (start-block-height uint) (governance-token <governance-token-trait>))
+(define-public (propose (proposal <proposal-trait>) (startBlockHeight uint) (governance-token <governance-token-trait>))
 	(begin
 		(try! (is-governance-token governance-token))
-		(asserts! (>= start-block-height (+ block-height (try! (get-parameter "minimum-proposal-start-delay")))) err-proposal-minimum-start-delay)
-		(asserts! (<= start-block-height (+ block-height (try! (get-parameter "maximum-proposal-start-delay")))) err-proposal-maximum-start-delay)
+		(asserts! (>= startBlockHeight (+ block-height (try! (get-parameter "minimum-proposal-start-delay")))) err-proposal-minimum-start-delay)
+		(asserts! (<= startBlockHeight (+ block-height (try! (get-parameter "maximum-proposal-start-delay")))) err-proposal-maximum-start-delay)
 		(asserts! (try! (contract-call? governance-token sdg-has-percentage-balance tx-sender (try! (get-parameter "propose-factor")))) err-insufficient-balance)
 		(contract-call? .sde001-proposal-voting add-proposal
 			proposal
 			{
-				start-block-height: start-block-height,
-				end-block-height: (+ start-block-height (try! (get-parameter "proposal-duration"))),
+				startBlockHeight: startBlockHeight,
+				endBlockHeight: (+ startBlockHeight (try! (get-parameter "proposal-duration"))),
 				proposer: tx-sender
 			}
 		)
