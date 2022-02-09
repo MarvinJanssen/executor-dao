@@ -12,9 +12,10 @@
 ;; anyone may trigger a conclusion. The proposal will then be executed if the
 ;; votes in favour exceed the ones against.
 
-(impl-trait .extension-trait.extension-trait)
 (use-trait proposal-trait .proposal-trait.proposal-trait)
 (use-trait governance-token-trait .governance-token-trait.governance-token-trait)
+
+(impl-trait .extension-trait.extension-trait)
 
 (define-constant ERR_UNAUTHORIZED (err u2500))
 (define-constant ERR_NOT_GOVERNANCE_TOKEN (err u2501))
@@ -87,7 +88,7 @@
 
 ;; Proposals
 
-(define-read-only (get-proposalData (proposal principal))
+(define-read-only (get-proposal-data (proposal principal))
 	(map-get? Proposals proposal)
 )
 

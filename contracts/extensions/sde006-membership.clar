@@ -6,12 +6,13 @@
 ;; Description:
 ;; An extension meant for creating safes or small groups of members to perform actions.
 
-(impl-trait .member-trait.member-trait)
-(impl-trait .extension-trait.extension-trait)
 (use-trait proposal-trait .proposal-trait.proposal-trait)
 
+(impl-trait .member-trait.member-trait)
+(impl-trait .extension-trait.extension-trait)
+
 (define-constant ERR_UNAUTHORIZED (err u2900))
-(define-constant err-not-a-member (err u2901))
+(define-constant ERR_NOT_A_MEMBER (err u2901))
 
 (define-map members principal bool)
 

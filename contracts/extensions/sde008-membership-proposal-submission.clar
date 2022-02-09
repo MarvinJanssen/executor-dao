@@ -13,23 +13,24 @@
 ;; start delay, and proposal duration can all by changed by means of a future
 ;; proposal.
 
-(impl-trait .extension-trait.extension-trait)
 (use-trait proposal-trait .proposal-trait.proposal-trait)
 (use-trait member-trait .member-trait.member-trait)
 
+(impl-trait .extension-trait.extension-trait)
+
 (define-constant ERR_UNAUTHORIZED (err u3100))
-(define-constant err-not-member-contract (err u3101))
-(define-constant err-unknown-parameter (err u3103))
-(define-constant err-proposal-minimum-start-delay (err u3104))
-(define-constant err-proposal-maximum-start-delay (err u3105))
+(define-constant ERR_NOT_MEMBER_CONTRACT (err u3101))
+(define-constant ERR_UNKNOWN_PARAMETER (err u3103))
+(define-constant ERR_PROPOSAL_MINIMUM_START_DELAY (err u3104))
+(define-constant ERR_PROPOSAL_MAXIMUM_START_DELAY (err u3105))
 
-(define-data-var member-contract-principal principal .sde006-membership)
+(define-data-var memberContractPrincipal principal .sde006-membership)
 
-(define-map parameters (string-ascii 34) uint)
+(define-map Parameters (string-ascii 34) uint)
 
-(map-set parameters "proposal-duration" u1440) ;; ~10 days based on a ~10 minute block time.
-(map-set parameters "minimum-proposal-start-delay" u144) ;; ~1 day minimum delay before voting on a proposal can start.
-(map-set parameters "maximum-proposal-start-delay" u1008) ;; ~7 days maximum delay before voting on a proposal can start.
+(map-set Parameters "proposalDuration" u1440) ;; ~10 days based on a ~10 minute block time.
+(map-set Parameters "minimumProposalStartDelay" u144) ;; ~1 day minimum delay before voting on a proposal can start.
+(map-set Parameters "maximumProposalStartDelay" u1008) ;; ~7 days maximum delay before voting on a proposal can start.
 
 ;; --- Authorization check
 
@@ -41,10 +42,10 @@
 
 ;; Member
 
-(define-public (set-member-contract (member-contract <member-trait>))
+(define-public (set-member-contract (memberContract <member-trait>))
   (begin
     (try! (is-dao-or-extension))
-    (ok (var-set member-contract-principal (contract-of member-contract)))
+    (ok (var-set memberContractPrincipal (contract-of memberContract)))
   )
 )
 
@@ -54,7 +55,7 @@
   (begin
     (try! (is-dao-or-extension))
     (try! (get-parameter parameter))
-    (ok (map-set parameters parameter value))
+    (ok (map-set Parameters parameter value))
   )
 )
 
@@ -62,7 +63,7 @@
   (begin
     (try! previous)
     (try! (get-parameter (get parameter item)))
-    (ok (map-set parameters (get parameter item) (get value item)))
+    (ok (map-set Parameters (get parameter item) (get value item)))
   )
 )
 
@@ -76,31 +77,31 @@
 ;; --- Public functions
 
 (define-read-only (get-member-contract)
-  (var-get member-contract-principal)
+  (var-get memberContractPrincipal)
 )
 
-(define-private (is-member-contract (member-contract <member-trait>))
-  (ok (asserts! (is-eq (contract-of member-contract) (var-get member-contract-principal)) err-not-member-contract))
+(define-private (is-member-contract (memberContract <member-trait>))
+  (ok (asserts! (is-eq (contract-of memberContract) (var-get memberContractPrincipal)) ERR_NOT_MEMBER_CONTRACT))
 )
 
 ;; Parameters
 
 (define-read-only (get-parameter (parameter (string-ascii 34)))
-  (ok (unwrap! (map-get? parameters parameter) err-unknown-parameter))
+  (ok (unwrap! (map-get? Parameters parameter) ERR_UNKNOWN_PARAMETER))
 )
 
 ;; Proposals
 
-(define-public (propose (proposal <proposal-trait>) (startBlockHeight uint) (member-contract <member-trait>))
+(define-public (propose (proposal <proposal-trait>) (startBlockHeight uint) (memberContract <member-trait>))
   (begin
-    (try! (is-member-contract member-contract))
-    (asserts! (>= startBlockHeight (+ block-height (try! (get-parameter "minimum-proposal-start-delay")))) err-proposal-minimum-start-delay)
-    (asserts! (<= startBlockHeight (+ block-height (try! (get-parameter "maximum-proposal-start-delay")))) err-proposal-maximum-start-delay)
+    (try! (is-member-contract memberContract))
+    (asserts! (>= startBlockHeight (+ block-height (try! (get-parameter "minimumProposalStartDelay")))) ERR_PROPOSAL_MINIMUM_START_DELAY)
+    (asserts! (<= startBlockHeight (+ block-height (try! (get-parameter "maximumProposalStartDelay")))) ERR_PROPOSAL_MAXIMUM_START_DELAY)
     (contract-call? .sde007-membership-proposal-voting add-proposal
       proposal
       {
         startBlockHeight: startBlockHeight,
-        endBlockHeight: (+ startBlockHeight (try! (get-parameter "proposal-duration"))),
+        endBlockHeight: (+ startBlockHeight (try! (get-parameter "proposalDuration"))),
         proposer: tx-sender
       }
     )

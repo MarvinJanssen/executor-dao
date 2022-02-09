@@ -11,12 +11,13 @@
 ;; anyone may trigger a conclusion. The proposal will then be executed if the
 ;; votes in favour exceed the ones against.
 
-(impl-trait .extension-trait.extension-trait)
 (use-trait proposal-trait .proposal-trait.proposal-trait)
 (use-trait member-trait .member-trait.member-trait)
 
+(impl-trait .extension-trait.extension-trait)
+
 (define-constant ERR_UNAUTHORIZED (err u3000))
-(define-constant err-not-member-contract (err u3001))
+(define-constant ERR_NOT_MEMBER_CONTRACT (err u3001))
 (define-constant ERR_PROPOSAL_ALREADY_EXECUTED (err u3002))
 (define-constant ERR_PROPOSAL_ALREADY_EXISTS (err u3003))
 (define-constant ERR_UNKNOWN_PROPOSAL (err u3004))
@@ -27,9 +28,9 @@
 (define-constant ERR_END_BLOCK_HEIGHT_NOT_REACHED (err u3009))
 (define-constant ERR_DISABLED (err u3010))
 
-(define-data-var member-contract-principal principal .sde006-membership)
+(define-data-var memberContractPrincipal principal .sde006-membership)
 
-(define-map proposals
+(define-map Proposals
   principal
   {
     votesFor: uint,
@@ -54,10 +55,10 @@
 
 ;; Member
 
-(define-public (set-member-contract (member-contract <member-trait>))
+(define-public (set-member-contract (memberContract <member-trait>))
   (begin
     (try! (is-dao-or-extension))
-    (ok (var-set member-contract-principal (contract-of member-contract)))
+    (ok (var-set memberContractPrincipal (contract-of memberContract)))
   )
 )
 
@@ -68,24 +69,24 @@
     (try! (is-dao-or-extension))
     (asserts! (is-none (contract-call? .executor-dao executed-at proposal)) ERR_PROPOSAL_ALREADY_EXECUTED)
     (print {event: "propose", proposal: proposal, proposer: tx-sender})
-    (ok (asserts! (map-insert proposals (contract-of proposal) (merge {votesFor: u0, votesAgainst: u0, concluded: false, passed: false} data)) ERR_PROPOSAL_ALREADY_EXISTS))
+    (ok (asserts! (map-insert Proposals (contract-of proposal) (merge {votesFor: u0, votesAgainst: u0, concluded: false, passed: false} data)) ERR_PROPOSAL_ALREADY_EXISTS))
   )
 )
 
 ;; --- Public functions
 
 (define-read-only (get-member-contract)
-  (var-get member-contract-principal)
+  (var-get memberContractPrincipal)
 )
 
-(define-private (is-member-contract (member-contract <member-trait>))
-  (ok (asserts! (is-eq (contract-of member-contract) (var-get member-contract-principal)) err-not-member-contract))
+(define-private (is-member-contract (memberContract <member-trait>))
+  (ok (asserts! (is-eq (contract-of memberContract) (var-get memberContractPrincipal)) ERR_NOT_MEMBER_CONTRACT))
 )
 
 ;; Proposals
 
-(define-read-only (get-proposalData (proposal principal))
-  (map-get? proposals proposal)
+(define-read-only (get-proposal-data (proposal principal))
+  (map-get? Proposals proposal)
 )
 
 ;; Votes
@@ -97,7 +98,7 @@
 (define-public (vote (for bool) (proposal principal) (member-contract <member-trait>))
   (let
     (
-      (proposalData (unwrap! (map-get? proposals proposal) ERR_UNKNOWN_PROPOSAL))
+      (proposalData (unwrap! (map-get? Proposals proposal) ERR_UNKNOWN_PROPOSAL))
     )
     (try! (is-member-contract member-contract))
     (asserts! (>= block-height (get startBlockHeight proposalData)) ERR_PROPOSAL_INACTIVE)
@@ -105,7 +106,7 @@
     (map-set MemberTotalVotes {proposal: proposal, voter: tx-sender}
       (+ (get-current-total-votes proposal tx-sender) u1)
     )
-    (map-set proposals proposal
+    (map-set Proposals proposal
       (if for
         (merge proposalData {votesFor: (+ (get votesFor proposalData) u1)})
         (merge proposalData {votesAgainst: (+ (get votesAgainst proposalData) u1)})
@@ -121,12 +122,12 @@
 (define-public (conclude (proposal <proposal-trait>))
   (let
     (
-      (proposalData (unwrap! (map-get? proposals (contract-of proposal)) ERR_UNKNOWN_PROPOSAL))
+      (proposalData (unwrap! (map-get? Proposals (contract-of proposal)) ERR_UNKNOWN_PROPOSAL))
       (passed (> (get votesFor proposalData) (get votesAgainst proposalData)))
     )
     (asserts! (not (get concluded proposalData)) ERR_PROPOSAL_ALREADY_CONCLUDED)
     (asserts! (>= block-height (get endBlockHeight proposalData)) ERR_END_BLOCK_HEIGHT_NOT_REACHED)
-    (map-set proposals (contract-of proposal) (merge proposalData {concluded: true, passed: passed}))
+    (map-set Proposals (contract-of proposal) (merge proposalData {concluded: true, passed: passed}))
     (print {event: "conclude", proposal: proposal, passed: passed})
     (and passed (try! (contract-call? .executor-dao execute proposal tx-sender)))
     (ok passed)

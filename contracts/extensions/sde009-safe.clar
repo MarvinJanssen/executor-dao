@@ -1,7 +1,7 @@
-(impl-trait .extension-trait.extension-trait)
-
 (use-trait nft-trait .sip009-nft-trait.sip009-nft-trait)
 (use-trait ft-trait .sip010-ft-trait.sip010-ft-trait)
+
+(impl-trait .extension-trait.extension-trait)
 
 (define-constant ERR_UNAUTHORIZED (err u3200))
 (define-constant ERR_ASSET_NOT_WHITELISTED (err u3201))

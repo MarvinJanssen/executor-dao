@@ -13,25 +13,26 @@
 ;; start delay, and proposal duration can all by changed by means of a future
 ;; proposal.
 
-(impl-trait .extension-trait.extension-trait)
 (use-trait proposal-trait .proposal-trait.proposal-trait)
 (use-trait governance-token-trait .governance-token-trait.governance-token-trait)
+
+(impl-trait .extension-trait.extension-trait)
 
 (define-constant ERR_UNAUTHORIZED (err u2600))
 (define-constant ERR_NOT_GOVERNANCE_TOKEN (err u2601))
 (define-constant err-insufficient-balance (err u2602))
-(define-constant err-unknown-parameter (err u2603))
-(define-constant err-proposal-minimum-start-delay (err u2604))
-(define-constant err-proposal-maximum-start-delay (err u2605))
+(define-constant ERR_UNKNOWN_PARAMETER (err u2603))
+(define-constant ERR_PROPOSAL_MINIMUM_START_DELAY (err u2604))
+(define-constant ERR_PROPOSAL_MAXIMUM_START_DELAY (err u2605))
 
 (define-data-var governanceTokenPrincipal principal .sde000-governance-token)
 
 (define-map parameters (string-ascii 34) uint)
 
 (map-set parameters "propose-factor" u100000) ;; 1% initially required to propose (100/n*1000).
-(map-set parameters "proposal-duration" u1440) ;; ~10 days based on a ~10 minute block time.
-(map-set parameters "minimum-proposal-start-delay" u144) ;; ~1 day minimum delay before voting on a proposal can start.
-(map-set parameters "maximum-proposal-start-delay" u1008) ;; ~7 days maximum delay before voting on a proposal can start.
+(map-set parameters "proposalDuration" u1440) ;; ~10 days based on a ~10 minute block time.
+(map-set parameters "minimumProposalStartDelay" u144) ;; ~1 day minimum delay before voting on a proposal can start.
+(map-set parameters "maximumProposalStartDelay" u1008) ;; ~7 days maximum delay before voting on a proposal can start.
 
 ;; --- Authorization check
 
@@ -90,7 +91,7 @@
 ;; Parameters
 
 (define-read-only (get-parameter (parameter (string-ascii 34)))
-	(ok (unwrap! (map-get? parameters parameter) err-unknown-parameter))
+	(ok (unwrap! (map-get? parameters parameter) ERR_UNKNOWN_PARAMETER))
 )
 
 ;; Proposals
@@ -98,14 +99,14 @@
 (define-public (propose (proposal <proposal-trait>) (startBlockHeight uint) (governance-token <governance-token-trait>))
 	(begin
 		(try! (is-governance-token governance-token))
-		(asserts! (>= startBlockHeight (+ block-height (try! (get-parameter "minimum-proposal-start-delay")))) err-proposal-minimum-start-delay)
-		(asserts! (<= startBlockHeight (+ block-height (try! (get-parameter "maximum-proposal-start-delay")))) err-proposal-maximum-start-delay)
+		(asserts! (>= startBlockHeight (+ block-height (try! (get-parameter "minimumProposalStartDelay")))) ERR_PROPOSAL_MINIMUM_START_DELAY)
+		(asserts! (<= startBlockHeight (+ block-height (try! (get-parameter "maximumProposalStartDelay")))) ERR_PROPOSAL_MAXIMUM_START_DELAY)
 		(asserts! (try! (contract-call? governance-token sdg-has-percentage-balance tx-sender (try! (get-parameter "propose-factor")))) err-insufficient-balance)
 		(contract-call? .sde001-proposal-voting add-proposal
 			proposal
 			{
 				startBlockHeight: startBlockHeight,
-				endBlockHeight: (+ startBlockHeight (try! (get-parameter "proposal-duration"))),
+				endBlockHeight: (+ startBlockHeight (try! (get-parameter "proposalDuration"))),
 				proposer: tx-sender
 			}
 		)
