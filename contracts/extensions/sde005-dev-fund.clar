@@ -1,6 +1,16 @@
+;;     _____________  _______ _________  ___  ___  ____  ____
+;;     / __/_  __/ _ |/ ___/ //_/ __/ _ \/ _ \/ _ |/ __ \/ __/
+;;     _\ \  / / / __ / /__/ ,< / _// , _/ // / __ / /_/ /\ \  
+;;    /___/ /_/ /_/ |_\___/_/|_/___/_/|_/____/_/ |_\____/___/  
+;;                                                          
+;;     _____  _____________  ______________  _  __           
+;;    / __/ |/_/_  __/ __/ |/ / __/  _/ __ \/ |/ /           
+;;   / _/_>  <  / / / _//    /\ \_/ // /_/ /    /            
+;;  /___/_/|_| /_/ /___/_/|_/___/___/\____/_/|_/             
+;;                                                           
+
 ;; Title: SDE005 Dev Fund
-;; Original Author: Marvin Janssen
-;; Maintaining Author: Ryan Waits
+;; Author: Marvin Janssen / StackerDAO Dev Team
 ;; Depends-On: SDP000
 ;; Synopsis:
 ;; A simple pre-seeded dev fund that can pay out developers on a monthly basis.

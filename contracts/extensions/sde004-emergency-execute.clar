@@ -1,6 +1,16 @@
+;;     _____________  _______ _________  ___  ___  ____  ____
+;;     / __/_  __/ _ |/ ___/ //_/ __/ _ \/ _ \/ _ |/ __ \/ __/
+;;     _\ \  / / / __ / /__/ ,< / _// , _/ // / __ / /_/ /\ \  
+;;    /___/ /_/ /_/ |_\___/_/|_/___/_/|_/____/_/ |_\____/___/  
+;;                                                          
+;;     _____  _____________  ______________  _  __           
+;;    / __/ |/_/_  __/ __/ |/ / __/  _/ __ \/ |/ /           
+;;   / _/_>  <  / / / _//    /\ \_/ // /_/ /    /            
+;;  /___/_/|_| /_/ /___/_/|_/___/___/\____/_/|_/             
+;;                                                           
+
 ;; Title: SDE004 Emergency Execute
-;; Original Author: Marvin Janssen
-;; Maintaining Author: Ryan Waits
+;; Author: Marvin Janssen / StackerDAO Dev Team
 ;; Depends-On: 
 ;; Synopsis:
 ;; This extension allows a small number of very trusted principals to immediately
@@ -39,7 +49,7 @@
 
 ;; --- Internal DAO functions
 
-(define-public (set-executiveTeamSunsetHeight (height uint))
+(define-public (set-executive-team-sunset-height (height uint))
 	(begin
 		(try! (is-dao-or-extension))
 		(asserts! (> height block-height) ERR_SUNSET_HEIGHT_IN_PAST)
@@ -86,6 +96,7 @@
 			(signals (+ (get-signals proposalPrincipal) (if (has-signaled proposalPrincipal tx-sender) u0 u1)))
 		)
 		(asserts! (is-executive-team-member tx-sender) ERR_NOT_EXECUTIVE_TEAM_MEMBER)
+		(asserts! (is-none (contract-call? .executor-dao executed-at proposal)) ERR_ALREADY_EXECUTED)
 		(asserts! (< block-height (var-get executiveTeamSunsetHeight)) ERR_SUNSET_HEIGHT_REACHED)
 		(and (>= signals (var-get executiveSignalsRequired))
 			(try! (contract-call? .executor-dao execute proposal tx-sender))

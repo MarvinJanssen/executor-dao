@@ -1,5 +1,13 @@
-;; StackerDAOs
-;; --- Forked from ExecutorDAO
+;;     _____________  _______ _________  ___  ___  ____  ____
+;;     / __/_  __/ _ |/ ___/ //_/ __/ _ \/ _ \/ _ |/ __ \/ __/
+;;     _\ \  / / / __ / /__/ ,< / _// , _/ // / __ / /_/ /\ \  
+;;    /___/ /_/ /_/ |_\___/_/|_/___/_/|_/____/_/ |_\____/___/  
+                                                         
+;;    _________  ___  ____                                   
+;;    / ___/ __ \/ _ \/ __/                                   
+;;   / /__/ /_/ / , _/ _/                                     
+;;   \___/\____/_/|_/___/                                     
+;;                                                         
 
 (use-trait proposal-trait .proposal-trait.proposal-trait)
 (use-trait extension-trait .extension-trait.extension-trait)
