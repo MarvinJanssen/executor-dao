@@ -40,7 +40,7 @@ Implements a SIP010 governance token with locking capabilities. The DAO has full
 
 Allows governance token holders to vote on proposals. (Note: *vote*, not *propose*.) One token equals one vote. Tokens used for voting are locked for the duration of the vote. They can then be reclaimed and used again. 
 
-### 8: Proposal Submission
+### SDE002: Proposal Submission
 
 Allows governance token holders that own at least 1% of the supply to submit a proposal to be voted on via SDE001. Proposals that are made this way are subject to a delay of at least 144 blocks (~1 day) to 1004 blocks (~7 days) and run for 1440 blocks (~10 days). All these parameters can be changed by a proposal.
 
@@ -72,7 +72,7 @@ Allows whitelisted members to submit a proposal to be voted on via SDE007. Propo
 
 StackerDAOs also comes with some reference and example proposals. These are designated by a code that starts with "SDP" followed by an incrementing number of three digits. The numbers do not to coincide with extension numbering.
 
-### SDP000: Create
+### SDP000: Bootstrap
 
 An initializing proposal that is meant to be executed when the StackerDAO is first deployed. It initialises boot extensions, sets various parameters on them, and any additional configuration needed via the enabled extensions.
 
@@ -92,9 +92,13 @@ A simple example on how StackerDAO can manage third-party smart contracts.
 
 A simple example on how StackerDAO can send funds on behalf of the DAO.
 
+### SDE005: Disable Emergency Proposal
+
+Disable the ability to propose any emergency proposals.
+
 ## Testing
 
-Unit tests coming soon, for now you can try it out manually in a `clarinet console` session. Execute the bootstrap proposal and have at it:
+TBD.
 
 ```clojure
 (contract-call? .executor-dao create .sdp000-bootstrap)

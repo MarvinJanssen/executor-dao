@@ -27,8 +27,10 @@
 (define-constant ERR_NO_VOTES_TO_RETURN (err u3008))
 (define-constant ERR_END_BLOCK_HEIGHT_NOT_REACHED (err u3009))
 (define-constant ERR_DISABLED (err u3010))
+(define-constant ERR_QUORUM_THRESHOLD_NOT_REACHED (err u3011))
 
 (define-data-var memberContractPrincipal principal .sde006-membership)
+(define-data-var quorumThresholdPercentage uint u10)
 
 (define-map Proposals
   principal
@@ -123,10 +125,13 @@
   (let
     (
       (proposalData (unwrap! (map-get? Proposals (contract-of proposal)) ERR_UNKNOWN_PROPOSAL))
+      (totalVotes (+ (get votesFor proposalData) (get votesAgainst proposalData)))
+      (quorum (/ (* totalVotes (var-get quorumThresholdPercentage)) u100))
       (passed (> (get votesFor proposalData) (get votesAgainst proposalData)))
     )
     (asserts! (not (get concluded proposalData)) ERR_PROPOSAL_ALREADY_CONCLUDED)
     (asserts! (>= block-height (get endBlockHeight proposalData)) ERR_END_BLOCK_HEIGHT_NOT_REACHED)
+    (asserts! (>= totalVotes quorum) ERR_QUORUM_THRESHOLD_NOT_REACHED)
     (map-set Proposals (contract-of proposal) (merge proposalData {concluded: true, passed: passed}))
     (print {event: "conclude", proposal: proposal, passed: passed})
     (and passed (try! (contract-call? .executor-dao execute proposal tx-sender)))
