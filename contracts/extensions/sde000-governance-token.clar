@@ -81,7 +81,7 @@
 	)
 )
 
-;; Other
+;; --- Public functions
 
 (define-public (set-name (newName (string-ascii 32)))
 	(begin
@@ -104,7 +104,7 @@
 	)
 )
 
-(define-public (set-tokenUri (newUri (optional (string-utf8 256))))
+(define-public (set-token-uri (newUri (optional (string-utf8 256))))
 	(begin
 		(try! (is-dao-or-extension))
 		(ok (var-set tokenUri newUri))
@@ -121,8 +121,6 @@
 		(ok (map sdg-mint-many-iter recipients))
 	)
 )
-
-;; --- Public functions
 
 ;; sip010-ft-trait
 
@@ -153,7 +151,7 @@
 	(ok (+ (ft-get-supply Stacker-DAO-Token) (ft-get-supply Stacker-DAO-Token-Locked)))
 )
 
-(define-read-only (get-tokenUri)
+(define-read-only (get-token-uri)
 	(ok (var-get tokenUri))
 )
 

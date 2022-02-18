@@ -1,26 +1,32 @@
 
-import { Clarinet, Tx, Chain, Account, types } from 'https://deno.land/x/clarinet@v0.14.0/index.ts';
+import { 
+  Clarinet, 
+  Tx, 
+  Chain, 
+  Account, 
+  types, 
+} from 'https://deno.land/x/clarinet@v0.14.0/index.ts';
 import { assertEquals } from 'https://deno.land/std@0.90.0/testing/asserts.ts';
+import { ExecutorDao, ErrCode } from './models/executor-dao-model.ts';
+import { EXTENSIONS, PROPOSALS } from './models/utils/contract-addresses.ts';
 
 Clarinet.test({
-    name: "Ensure that <...>",
-    async fn(chain: Chain, accounts: Map<string, Account>) {
-        let block = chain.mineBlock([
-            /* 
-             * Add transactions with: 
-             * Tx.contractCall(...)
-            */
-        ]);
-        assertEquals(block.receipts.length, 0);
-        assertEquals(block.height, 2);
+  name: 'ExecutorDao',
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    let deployer = accounts.get('deployer')!;
+    let Dao = new ExecutorDao(chain);
+    let result : any = null;
+  
+    // check if the extension is enabled
+    result = await Dao.isExtension(deployer, types.principal(EXTENSIONS.sde009Safe));
+    result.expectBool(false);
 
-        block = chain.mineBlock([
-            /* 
-             * Add transactions with: 
-             * Tx.contractCall(...)
-            */
-        ]);
-        assertEquals(block.receipts.length, 0);
-        assertEquals(block.height, 3);
-    },
+    // initialize the contract with extensions
+    result = await Dao.initialize(deployer);
+    result.expectOk().expectBool(true);
+
+    // check if the extension is now enabled
+    result = await Dao.isExtension(deployer, types.principal(EXTENSIONS.sde009Safe));
+    result.expectBool(true);
+  },
 });

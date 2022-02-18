@@ -19,6 +19,6 @@
 		(get-total-supply () (response uint uint))
 
 		;; an optional URI that represents metadata of this token
-		(get-tokenUri () (response (optional (string-utf8 256)) uint))
+		(get-token-uri () (response (optional (string-utf8 256)) uint))
 	)
 )

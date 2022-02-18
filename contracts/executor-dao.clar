@@ -71,7 +71,7 @@
 
 ;; --- Initial DAO setup with extensions, members, team members, and executive members
 
-(define-public (create (proposal <proposal-trait>))
+(define-public (initialize (proposal <proposal-trait>))
 	(let ((sender tx-sender))
 		(asserts! (is-eq sender (var-get executive)) ERR_UNAUTHORIZED)
 		(var-set executive (as-contract tx-sender))

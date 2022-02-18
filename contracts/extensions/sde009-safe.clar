@@ -32,7 +32,6 @@
 
 (define-map WhitelistedAssets principal bool)
 
-
 ;; --- Authorization check
 
 (define-public (is-dao-or-extension)
@@ -75,7 +74,6 @@
   )
 )
 
-
 (define-public (send-stx (amount uint) (recipient principal))
   (begin
     (try! (is-dao-or-extension))
@@ -113,7 +111,12 @@
 
 ;; Simple function to get a whitelisted asset
 (define-read-only (get-whitelisted-asset (assetContract principal))
-    (map-get? WhitelistedAssets assetContract)
+  (map-get? WhitelistedAssets assetContract)
+)
+
+;; Get the balance of the safe
+(define-read-only (get-balance)
+  (stx-get-balance CONTRACT_ADDRESS)
 )
 
 ;; --- Extension callback
