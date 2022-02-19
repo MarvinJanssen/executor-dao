@@ -7,7 +7,7 @@ import {
   types, 
 } from 'https://deno.land/x/clarinet@v0.14.0/index.ts';
 import { assertEquals } from 'https://deno.land/std@0.90.0/testing/asserts.ts';
-import { ExecutorDao, ErrCode } from './models/executor-dao-model.ts';
+import { ExecutorDao, EXECUTOR_DAO_CODES } from './models/executor-dao-model.ts';
 import { EXTENSIONS, PROPOSALS } from './models/utils/contract-addresses.ts';
 
 Clarinet.test({
@@ -21,12 +21,24 @@ Clarinet.test({
     result = await Dao.isExtension(deployer, types.principal(EXTENSIONS.sde009Safe));
     result.expectBool(false);
 
-    // initialize the contract with extensions
+    // initialize the DAO with enabled extensions for .sde009-safe
     result = await Dao.initialize(deployer);
     result.expectOk().expectBool(true);
+
+    // once already called, initialize can only be called by the dao or enabled extensions 
+    result = await Dao.initialize(deployer);
+    result.expectErr().expectUint(EXECUTOR_DAO_CODES.ERR_UNAUTHORIZED);
 
     // check if the extension is now enabled
     result = await Dao.isExtension(deployer, types.principal(EXTENSIONS.sde009Safe));
     result.expectBool(true);
+
+    // fail to set-extension without going through a proposal
+    result = await Dao.setExtension(deployer, types.principal(EXTENSIONS.sde009Safe), types.bool(false));
+    result.expectErr().expectUint(EXECUTOR_DAO_CODES.ERR_UNAUTHORIZED);
+
+    // fail to execute a proposal without going through proposal process
+    result = await Dao.execute(deployer, types.principal(PROPOSALS.sdp004SendFunds));
+    result.expectErr().expectUint(EXECUTOR_DAO_CODES.ERR_UNAUTHORIZED);
   },
 });

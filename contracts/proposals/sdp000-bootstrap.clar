@@ -51,10 +51,6 @@
 		(try! (contract-call? .sde006-membership set-member 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM true))
 		(try! (contract-call? .sde006-membership set-member 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5 true))
 		(try! (contract-call? .sde006-membership set-member 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG true))
-		(try! (contract-call? .sde006-membership set-member 'ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC true))
-		(try! (contract-call? .sde006-membership set-member 'ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND true))
-		(try! (contract-call? .sde006-membership set-member 'ST2REHHS5J3CERCRBEPMGH7921Q6PYKAADT7JP2VB true))
-		(try! (contract-call? .sde006-membership set-member 'ST3AM1A56AK2C1XAFJ4115ZSV26EB49BVQ10MGCS0 true))
 
 		(print "It's goin DAOn...")
 		(ok true)

@@ -30,9 +30,9 @@
 
 (define-constant ERR_UNAUTHORIZED (err u3100))
 (define-constant ERR_NOT_MEMBER_CONTRACT (err u3101))
-(define-constant ERR_UNKNOWN_PARAMETER (err u3103))
-(define-constant ERR_PROPOSAL_MINIMUM_START_DELAY (err u3104))
-(define-constant ERR_PROPOSAL_MAXIMUM_START_DELAY (err u3105))
+(define-constant ERR_UNKNOWN_PARAMETER (err u3102))
+(define-constant ERR_PROPOSAL_MINIMUM_START_DELAY (err u3103))
+(define-constant ERR_PROPOSAL_MAXIMUM_START_DELAY (err u3104))
 
 (define-data-var memberContractPrincipal principal .sde006-membership)
 

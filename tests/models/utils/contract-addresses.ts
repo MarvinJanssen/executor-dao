@@ -22,4 +22,5 @@ export const PROPOSALS = {
   sdp003WhitelistEscrowNft: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.sdp003-whitelist-escrow-nft",
   sdp004SendFunds: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.sdp004-send-funds",
   sdp005DisableEmergencyProposal: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.sdp005-disable-emergency-proposal",
+  sdp006AddMember: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.sdp006-add-member",
 };
