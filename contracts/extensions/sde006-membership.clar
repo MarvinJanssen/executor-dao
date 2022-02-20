@@ -24,8 +24,10 @@
 
 (define-constant ERR_UNAUTHORIZED (err u2900))
 (define-constant ERR_NOT_A_MEMBER (err u2901))
+(define-constant ERR_MEMBER_BLACKLISTED (err u2902))
 
 (define-map members principal bool)
+(define-map blacklist-members principal bool)
 
 ;; --- Authorization check
 
@@ -38,14 +40,28 @@
 (define-public (set-member (who principal) (member bool))
   (begin
     (try! (is-dao-or-extension))
+    (asserts! (is-none (map-get? blacklist-members who)) ERR_MEMBER_BLACKLISTED)
     (ok (map-set members who member))
+  )
+)
+
+(define-public (set-blacklist (who principal) (member bool))
+  (begin
+    (try! (is-dao-or-extension))
+    (ok (map-set blacklist-members who member))
   )
 )
 
 ;; --- Public functions
 
+;; --- Read Only Functions
+
 (define-read-only (is-member (who principal))
   (default-to false (map-get? members who))
+)
+
+(define-read-only (is-blacklisted (who principal))
+  (default-to false (map-get? blacklist-members who))
 )
 
 ;; --- Extension callback
