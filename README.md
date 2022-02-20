@@ -1,5 +1,4 @@
 # StackerDAO
-> A huge shoutout to Marvin for kicking things off with **ExecutorDAO** and allowing us to fork his work and expand, you can find it [here](https://github.com/MarvinJanssen/executor-dao).
 
 StackerDAOs is a fork of ExecutorDAO, and models its design in the same modular and flexible way. The core tenets remain the same:
 
@@ -9,7 +8,7 @@ StackerDAOs is a fork of ExecutorDAO, and models its design in the same modular 
 
 ## 1. Proposals are smart contracts
 
-The way a conventional company operates is defined in its constitution. Changes are made by means of resolutions put forward by its members, the process of which is described by that same constitution. Translating this into a DAO was one of the aims when designing StackerDAO. Proposals are therefore expressed as smart contracts. Clarity is a beautifully expressive language. Instead of verbose "Legalese", we can describe the operation, duties, and members using concise logical statements. Proposals implement a specific trait and may be executed by the DAO when certain conditions are met. It makes StackerDAO extremely flexible and powerful.
+Proposals are expressed as smart contracts. These smart contracts implement a specific `proposal-trait` and may be executed by the DAO when certain conditions are met. It makes StackerDAO extremely flexible and powerful.
 
 ## 2. The core executes, the extensions give form
 
@@ -22,15 +21,15 @@ StackerDAO initially consists of just one core contract. Its sole purpose is to 
 - Salary payouts to specific members.
 - And more...
 
-Since extensions become part of the DAO, they have privileged access to everything else included in the DAO. The trick that allows for extension interoperability is a common authorization check. Privileged access is granted when the sending context is equal to that of the DAO or if the contract caller is an enabled DAO extension. It allows for extensions that depend on other extensions to be designed. They can be disabled and replaced at any time making StackerDAO fully polymorphic.
+Since extensions become part of the DAO, they have privileged access to everything else included in the DAO. The trick that allows for extension interoperability is a common authorization check. *Privileged access is granted when the sending context is equal to that of the DAO or if the contract caller is an enabled DAO extension*. It allows for extensions that depend on other extensions to be designed. They can be disabled and replaced at any time making StackerDAO fully polymorphic.
 
 ## 3. Ownership control happens via sending context
 
-StackerDAO follows a single-address ownership model. The core contract is the de facto owner of external ownable contracts. (An ownable contract is to be understood as a contract that stores one privileged principal that may change internal state.) External contracts thus do not need to implement a complicated access model, as any proposal or extension may act upon it. Any ownable contract, even the ones that were deployed before StackerDAO came into use, can be owned and managed by the DAO. Proposals are executed in the sending context of the DAO and extensions can request it via a callback procedure.
+StackerDAO follows a single-address ownership model. The core contract is the de facto owner of external ownable contracts. (An ownable contract is to be understood as a contract that stores one privileged principal that may change internal state.) External contracts thus do not need to implement a complicated access model, as any proposal or extension may act upon it. *Any ownable contract, even the ones that were deployed before StackerDAO came into use, can be owned and managed by the DAO*.
 
-## Reference extensions
+## Extensions
 
-The StackerDAO code based is a fork from The StackerDAO code base comes with several additional extension contracts. The modified extentions are designated by a code that starts with "SDE" followed by an incrementing number of three digits.
+The StackerDAO code base comes with several additional extension contracts. The modified extentions are designated by a code that starts with "SDE" followed by an incrementing number of three digits.
 
 ### SDE000: Governance Token
 
@@ -68,9 +67,9 @@ Allows whitelisted members to vote on proposals. (Note: *vote*, not *propose*.) 
 
 Allows whitelisted members to submit a proposal to be voted on via SDE007. Proposals that are made this way are subject to a delay of at least 144 blocks (~1 day) to 1004 blocks (~7 days) and run for 1440 blocks (~10 days). All these parameters can be changed by a proposal.
 
-## Reference proposals
+## Proposals
 
-StackerDAOs also comes with some reference and example proposals. These are designated by a code that starts with "SDP" followed by an incrementing number of three digits. The numbers do not to coincide with extension numbering.
+StackerDAOs also comes with some example proposals. These are designated by a code that starts with "SDP" followed by an incrementing number of three digits. The numbers do not to coincide with extension numbering.
 
 ### SDP000: Bootstrap
 
@@ -114,7 +113,7 @@ To propose `sdp004-send-funds`, run the following commands one by one:
 ;; Advance the chain 144 blocks.
 ::advance_chain_tip 144
 
-;; Vote YES with 100 tokens.
+;; Vote YES
 (contract-call? .sde007-membership-proposal-voting vote true .sdp004-send-funds .sde006-membership)
 
 ;; (Optional) take a look at the current proposal data.
@@ -127,7 +126,7 @@ To propose `sdp004-send-funds`, run the following commands one by one:
 (contract-call? .sde007-membership-proposal-voting conclude .sdp004-send-funds)
 
 ;; Check that the sde004-send-funds contract sent
-;; the funds to the proper destination.
+;; the funds to the proper destination set in sdp004-send-funds.
 ::get_assets_maps
 ```
 
