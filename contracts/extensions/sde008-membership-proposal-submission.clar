@@ -9,9 +9,9 @@
 ;;  /___/_/|_| /_/ /___/_/|_/___/___/\____/_/|_/             
 ;;                                                           
 
-;; Title: SDE002 Proposal Submission
+;; Title: SDE008 Membership Proposal Submission
 ;; Author: StackerDAO Dev Team
-;; Depends-On: SDE001
+;; Depends-On: SDE007
 ;; Synopsis:
 ;; This extension part of the core of StackerDAO. It allows governance token
 ;; holders to submit proposals when they hold at least n% percentage of the
@@ -91,7 +91,7 @@
 )
 
 (define-private (is-member-contract (memberContract <member-trait>))
-  (ok (asserts! (is-eq (contract-of memberContract) (var-get memberContractPrincipal)) ERR_NOT_MEMBER_CONTRACT))
+  (ok (asserts! (is-eq (contract-of memberContract) (get-member-contract)) ERR_NOT_MEMBER_CONTRACT))
 )
 
 ;; Parameters

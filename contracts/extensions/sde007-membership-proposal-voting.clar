@@ -9,7 +9,7 @@
 ;;  /___/_/|_| /_/ /___/_/|_/___/___/\____/_/|_/             
 ;;                                                           
 
-;; Title: SDE001 Proposal Voting
+;; Title: SDE007 Membership Proposal Voting
 ;; Author: StackerDAO Dev Team
 ;; Depends-On: SDE000
 ;; Synopsis:
@@ -93,7 +93,7 @@
 )
 
 (define-private (is-member-contract (memberContract <member-trait>))
-  (ok (asserts! (is-eq (contract-of memberContract) (var-get memberContractPrincipal)) ERR_NOT_MEMBER_CONTRACT))
+  (ok (asserts! (is-eq (contract-of memberContract) (get-member-contract)) ERR_NOT_MEMBER_CONTRACT))
 )
 
 ;; Proposals
