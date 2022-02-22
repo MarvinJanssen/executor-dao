@@ -57,7 +57,10 @@
 ;; --- Read Only Functions
 
 (define-read-only (is-member (who principal))
-  (default-to false (map-get? members who))
+  (if (is-blacklisted who)
+    false
+    (default-to false (map-get? members who))
+  )
 )
 
 (define-read-only (is-blacklisted (who principal))
