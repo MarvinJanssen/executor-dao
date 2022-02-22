@@ -1,10 +1,8 @@
 import { 
-  Clarinet, 
-  Tx, 
-  Chain, 
   Account, 
-  types, 
-} from 'https://deno.land/x/clarinet@v0.14.0/index.ts';
+  Chain, 
+  Tx 
+} from './utils/helpers.ts';
 import { PROPOSALS } from './utils/contract-addresses.ts';
 
 export enum SDE007_PROPOSAL_VOTING_CODES {
