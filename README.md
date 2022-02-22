@@ -114,16 +114,16 @@ To propose `sdp004-send-funds`, run the following commands one by one:
 ::advance_chain_tip 144
 
 ;; Vote YES
-(contract-call? .sde007-membership-proposal-voting vote true .sdp004-send-funds .sde006-membership)
+(contract-call? .sde007-voting vote true .sdp004-send-funds .sde006-membership)
 
 ;; (Optional) take a look at the current proposal data.
-(contract-call? .sde007-membership-proposal-voting get-proposal-data .sdp004-send-funds)
+(contract-call? .sde007-voting get-proposal-data .sdp004-send-funds)
 
 ;; Advance the chain tip until after the proposal concludes.
 ::advance_chain_tip 1440
 
 ;; Conclude the proposal vote, thus executing it.
-(contract-call? .sde007-membership-proposal-voting conclude .sdp004-send-funds)
+(contract-call? .sde007-voting conclude .sdp004-send-funds)
 
 ;; Check that the sde004-send-funds contract sent
 ;; the funds to the proper destination set in sdp004-send-funds.

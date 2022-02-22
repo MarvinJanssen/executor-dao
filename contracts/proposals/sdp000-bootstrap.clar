@@ -30,8 +30,8 @@
 				{extension: .sde003-emergency-proposals, enabled: true}
 				{extension: .sde004-emergency-execute, enabled: true}
 				{extension: .sde006-membership, enabled: true}
-				{extension: .sde007-membership-proposal-voting, enabled: true}
-				{extension: .sde008-membership-proposal-submission, enabled: true}
+				{extension: .sde007-proposal-voting, enabled: true}
+				{extension: .sde008-proposal-submission, enabled: true}
 				{extension: .sde009-safe, enabled: true}
 			)
 		))

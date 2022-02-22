@@ -8,9 +8,9 @@ import {
 } from 'https://deno.land/x/clarinet@v0.14.0/index.ts';
 import { assertEquals } from 'https://deno.land/std@0.90.0/testing/asserts.ts';
 import { ExecutorDao } from '../models/executor-dao-model.ts';
-import { SDE006Membership, MEMBERSHIP_CODES } from '../models/sde006-membership-model.ts';
-import { SDE008MembershipProposalSubmission, MEMBERSHIP_PROPOSAL_SUBMISSION_CODES } from '../models/sde008-membership-proposal-submission-model.ts';
-import { SDE007MembershipProposalVoting, MEMBERSHIP_PROPOSAL_VOTING_CODES } from '../models/sde007-membership-proposal-voting-model.ts';
+import { SDE006Membership, SDE006_MEMBERSHIP_CODES } from '../models/sde006-membership-model.ts';
+import { SDE008ProposalSubmission, SDE008_PROPOSAL_SUBMISSION_CODES } from '../models/sde008-proposal-submission-model.ts';
+import { SDE007ProposalVoting, SDE007_PROPOSAL_VOTING_CODES } from '../models/sde007-proposal-voting-model.ts';
 import { EXTENSIONS, PROPOSALS } from '../models/utils/contract-addresses.ts';
 
 Clarinet.test({
@@ -19,7 +19,7 @@ Clarinet.test({
     let deployer = accounts.get('deployer')!;
     let Dao = new ExecutorDao(chain);
     let Membership = new SDE006Membership(chain);
-    let ProposalSubmission = new SDE008MembershipProposalSubmission(chain);
+    let ProposalSubmission = new SDE008ProposalSubmission(chain);
     let result: any = null;
     let invalidStartHeight: number = 50; 
     
@@ -29,11 +29,11 @@ Clarinet.test({
 
     // 1b. should return error if trying to set member without going through approval process
     result = await Membership.setMember(deployer, types.principal(deployer.address), types.bool(true));
-    result.expectErr().expectUint(MEMBERSHIP_CODES.ERR_UNAUTHORIZED);
+    result.expectErr().expectUint(SDE006_MEMBERSHIP_CODES.ERR_UNAUTHORIZED);
 
     // 1c. should not allow a non-member to add a proposal
     result = await ProposalSubmission.propose(deployer, types.principal(PROPOSALS.sdp006AddMember), types.uint(150), types.principal(EXTENSIONS.sde006Membership));
-    result.expectErr().expectUint(MEMBERSHIP_PROPOSAL_VOTING_CODES.ERR_UNAUTHORIZED);
+    result.expectErr().expectUint(SDE007_PROPOSAL_VOTING_CODES.ERR_UNAUTHORIZED);
 
     // 2a. initialize the DAO with enabled extensions and set deployer as a member
     result = await Dao.initialize(deployer);
@@ -41,12 +41,12 @@ Clarinet.test({
 
     // 3a. should not allow a startHeight less than the minimum 
     result = await ProposalSubmission.propose(deployer, types.principal(PROPOSALS.sdp006AddMember), types.uint(invalidStartHeight), types.principal(EXTENSIONS.sde006Membership));
-    result.expectErr().expectUint(MEMBERSHIP_PROPOSAL_SUBMISSION_CODES.ERR_PROPOSAL_MINIMUM_START_DELAY);
+    result.expectErr().expectUint(SDE008_PROPOSAL_SUBMISSION_CODES.ERR_PROPOSAL_MINIMUM_START_DELAY);
 
     // 3b. should not allow a startHeight greater than the maximum 
     invalidStartHeight = 1100;
     result = await ProposalSubmission.propose(deployer, types.principal(PROPOSALS.sdp006AddMember), types.uint(invalidStartHeight), types.principal(EXTENSIONS.sde006Membership));
-    result.expectErr().expectUint(MEMBERSHIP_PROPOSAL_SUBMISSION_CODES.ERR_PROPOSAL_MAXIMUM_START_DELAY);
+    result.expectErr().expectUint(SDE008_PROPOSAL_SUBMISSION_CODES.ERR_PROPOSAL_MAXIMUM_START_DELAY);
   },
 });
 
@@ -59,8 +59,8 @@ Clarinet.test({
     let proposedNewMember = accounts.get('wallet_3')!;
     let Dao = new ExecutorDao(chain);
     let Membership = new SDE006Membership(chain);
-    let ProposalSubmission = new SDE008MembershipProposalSubmission(chain);
-    let ProposalVoting = new SDE007MembershipProposalVoting(chain);
+    let ProposalSubmission = new SDE008ProposalSubmission(chain);
+    let ProposalVoting = new SDE007ProposalVoting(chain);
     let result: any = null;
     let validStartHeight: number = 150;
     let proposalDuration: number = 1440;

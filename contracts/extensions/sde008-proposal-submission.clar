@@ -9,7 +9,7 @@
 ;;  /___/_/|_| /_/ /___/_/|_/___/___/\____/_/|_/             
 ;;                                                           
 
-;; Title: SDE008 Membership Proposal Submission
+;; Title: SDE008 Proposal Submission
 ;; Author: StackerDAO Dev Team
 ;; Depends-On: SDE007
 ;; Synopsis:
@@ -107,7 +107,7 @@
     (try! (is-member-contract memberContract))
     (asserts! (>= startBlockHeight (+ block-height (try! (get-parameter "minimumProposalStartDelay")))) ERR_PROPOSAL_MINIMUM_START_DELAY)
     (asserts! (<= startBlockHeight (+ block-height (try! (get-parameter "maximumProposalStartDelay")))) ERR_PROPOSAL_MAXIMUM_START_DELAY)
-    (contract-call? .sde007-membership-proposal-voting add-proposal
+    (contract-call? .sde007-proposal-voting add-proposal
       proposal
       {
         startBlockHeight: startBlockHeight,
