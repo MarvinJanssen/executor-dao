@@ -1,0 +1,5 @@
+Only testing function that can be called by externally
+- public 
+- read only
+Not testing private functions:
+- privates are not tested directly, only called in other function

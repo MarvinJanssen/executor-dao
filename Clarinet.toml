@@ -71,6 +71,10 @@ depends_on = ["proposal-trait"]
 path = "contracts/proposals/sdp006-add-member.clar"
 depends_on = ["proposal-trait"]
 
+[contracts.sdp007-whitelist-asset]
+path = "contracts/proposals/sdp007-whitelist-asset.clar"
+depends_on = ["proposal-trait"]
+
 [contracts.executor-dao]
 path = "contracts/executor-dao.clar"
 depends_on = ["proposal-trait", "extension-trait"]
