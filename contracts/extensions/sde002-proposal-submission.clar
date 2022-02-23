@@ -30,7 +30,7 @@
 
 (define-constant ERR_UNAUTHORIZED (err u2600))
 (define-constant ERR_NOT_GOVERNANCE_TOKEN (err u2601))
-(define-constant err-insufficient-balance (err u2602))
+(define-constant ERR_INSUFFICIENT_BALANCE (err u2602))
 (define-constant ERR_UNKNOWN_PARAMETER (err u2603))
 (define-constant ERR_PROPOSAL_MINIMUM_START_DELAY (err u2604))
 (define-constant ERR_PROPOSAL_MAXIMUM_START_DELAY (err u2605))
@@ -39,7 +39,7 @@
 
 (define-map parameters (string-ascii 34) uint)
 
-(map-set parameters "propose-factor" u100000) ;; 1% initially required to propose (100/n*1000).
+(map-set parameters "proposeFactor" u100000) ;; 1% initially required to propose (100/n*1000).
 (map-set parameters "proposalDuration" u1440) ;; ~10 days based on a ~10 minute block time.
 (map-set parameters "minimumProposalStartDelay" u144) ;; ~1 day minimum delay before voting on a proposal can start.
 (map-set parameters "maximumProposalStartDelay" u1008) ;; ~7 days maximum delay before voting on a proposal can start.
@@ -111,7 +111,7 @@
 		(try! (is-governance-token governance-token))
 		(asserts! (>= startBlockHeight (+ block-height (try! (get-parameter "minimumProposalStartDelay")))) ERR_PROPOSAL_MINIMUM_START_DELAY)
 		(asserts! (<= startBlockHeight (+ block-height (try! (get-parameter "maximumProposalStartDelay")))) ERR_PROPOSAL_MAXIMUM_START_DELAY)
-		(asserts! (try! (contract-call? governance-token sdg-has-percentage-balance tx-sender (try! (get-parameter "propose-factor")))) err-insufficient-balance)
+		(asserts! (try! (contract-call? governance-token sdg-has-percentage-balance tx-sender (try! (get-parameter "proposeFactor")))) ERR_INSUFFICIENT_BALANCE)
 		(contract-call? .sde001-proposal-voting add-proposal
 			proposal
 			{

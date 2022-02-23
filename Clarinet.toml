@@ -49,6 +49,14 @@ depends_on = ["executor-dao", "extension-trait", "sip009-nft-trait", "sip010-ft-
 path = "contracts/extensions/sde010-miamicoin-stacking.clar"
 depends_on = ["executor-dao", "extension-trait"]
 
+[contracts.sde011-proposal-voting]
+path = "contracts/extensions/sde011-proposal-voting.clar"
+depends_on = ["executor-dao", "extension-trait", "nft-membership"]
+
+[contracts.sde012-proposal-submission]
+path = "contracts/extensions/sde012-proposal-submission.clar"
+depends_on = ["executor-dao", "extension-trait", "nft-membership", "sde011-proposal-voting"]
+
 [contracts.sdp000-bootstrap]
 path = "contracts/proposals/sdp000-bootstrap.clar"
 depends_on = ["executor-dao", "proposal-trait", "extension-trait", "sde000-governance-token", "sde001-proposal-voting", "sde002-proposal-submission", "sde003-emergency-proposals", "sde004-emergency-execute", "sde006-membership", "sde007-proposal-voting", "sde008-proposal-submission", "sde009-safe"]
@@ -96,6 +104,10 @@ depends_on = []
 [contracts.nft-escrow]
 path = "contracts/external/nft-escrow.clar"
 depends_on = ["ownable-trait"]
+
+[contracts.nft-membership]
+path = "contracts/external/nft-membership.clar"
+depends_on = ["sip009-nft-trait"]
 
 [contracts.citycoin-auth]
 path = "contracts/external/citycoins/citycoin-auth.clar"
