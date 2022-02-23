@@ -109,6 +109,10 @@ depends_on = ["ownable-trait"]
 path = "contracts/external/nft-membership.clar"
 depends_on = ["sip009-nft-trait"]
 
+[contracts.ft-membership]
+path = "contracts/external/ft-membership.clar"
+depends_on = ["sip010-ft-trait"]
+
 [contracts.citycoin-auth]
 path = "contracts/external/citycoins/citycoin-auth.clar"
 depends_on = ["citycoin-core-trait", "citycoin-token-trait"]
