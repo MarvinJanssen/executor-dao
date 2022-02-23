@@ -83,8 +83,7 @@
 
 (define-public (request-extension-callback (extension <extension-trait>) (memo (buff 34)))
 	(let ((sender tx-sender))
-		(asserts! (is-extension contract-caller) ERR_INVALID_EXTENSION)
-		(asserts! (is-eq contract-caller (contract-of extension)) ERR_INVALID_EXTENSION)
+		(asserts! (and (is-extension contract-caller) (is-eq contract-caller (contract-of extension))) ERR_INVALID_EXTENSION)
 		(as-contract (contract-call? extension callback sender memo))
 	)
 )

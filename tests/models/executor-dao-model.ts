@@ -19,14 +19,6 @@ export class ExecutorDao {
     this.chain = chain;
   }
 
-  initialize(sender: Account) {
-    let block = this.chain.mineBlock([
-      Tx.contractCall('executor-dao', 'initialize', [types.principal(PROPOSALS.sdp000Bootstrap)], sender.address),
-    ]);
-
-    return block.receipts[0].result;
-  }
-
   isExtension(sender: Account, extension: any) {
     let block = this.chain.mineBlock([
       Tx.contractCall('executor-dao', 'is-extension', [extension], sender.address),
@@ -43,6 +35,14 @@ export class ExecutorDao {
     return block.receipts[0].result;
   }
 
+  setExtensions(sender: Account, extensionsList: any) {
+    let block = this.chain.mineBlock([
+      Tx.contractCall('executor-dao', 'set-extensions', [extensionsList], sender.address),
+    ]);
+
+    return block.receipts[0].result;
+  }
+
   executedAt(sender: Account, proposal: any) {
     let block = this.chain.mineBlock([
       Tx.contractCall('executor-dao', 'executed-at', [proposal], sender.address),
@@ -54,6 +54,22 @@ export class ExecutorDao {
   execute(sender: Account, proposal: any) {
     let block = this.chain.mineBlock([
       Tx.contractCall('executor-dao', 'execute', [proposal, types.principal(sender.address)], sender.address),
+    ]);
+
+    return block.receipts[0].result;
+  }
+
+  initialize(sender: Account) {
+    let block = this.chain.mineBlock([
+      Tx.contractCall('executor-dao', 'initialize', [types.principal(PROPOSALS.sdp000Bootstrap)], sender.address),
+    ]);
+
+    return block.receipts[0].result;
+  }
+
+  requestExtensionCallback(sender: Account, extension: any, memo: string) {
+    let block = this.chain.mineBlock([
+      Tx.contractCall('executor-dao', 'request-extension-callback', [extension, memo], sender.address),
     ]);
 
     return block.receipts[0].result;
