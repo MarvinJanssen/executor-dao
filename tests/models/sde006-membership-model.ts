@@ -22,7 +22,7 @@ export class SDE006Membership {
       Tx.contractCall('sde006-membership', 'set-member', [who, isMember], sender.address),
     ]);
 
-    return block.receipts[0].result;
+    return { result: block.receipts[0].result, events: block.receipts[0].events };
   };
 
   setBlacklist(sender: Account, who: string, isMember: string) {
@@ -30,7 +30,7 @@ export class SDE006Membership {
       Tx.contractCall('sde006-membership', 'set-blacklist', [who, isMember], sender.address),
     ]);
 
-    return block.receipts[0].result;
+    return { result: block.receipts[0].result, events: block.receipts[0].events };
   };
 
   isMember(sender: Account, who: string) {
@@ -38,7 +38,7 @@ export class SDE006Membership {
       Tx.contractCall('sde006-membership', 'is-member', [who], sender.address),
     ]);
 
-    return block.receipts[0].result;
+    return { result: block.receipts[0].result, events: block.receipts[0].events };
   };
 
   isBlacklisted(sender: Account, who: string) {
@@ -46,7 +46,7 @@ export class SDE006Membership {
       Tx.contractCall('sde006-membership', 'is-blacklisted', [who], sender.address),
     ]);
 
-    return block.receipts[0].result;
+    return { result: block.receipts[0].result, events: block.receipts[0].events };
   };
 
   callback(sender: Account, memo: string) {
@@ -54,6 +54,6 @@ export class SDE006Membership {
       Tx.contractCall('sde006-membership', 'callback', [memo], sender.address),
     ]);
 
-    return block.receipts[0].result;
+    return { result: block.receipts[0].result, events: block.receipts[0].events };
   };
 };

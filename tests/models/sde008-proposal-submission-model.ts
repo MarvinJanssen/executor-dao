@@ -25,7 +25,7 @@ export class SDE008ProposalSubmission {
       Tx.contractCall('sde008-proposal-submission', 'set-member-contract', [memberContract], sender.address),
     ]);
 
-    return block.receipts[0].result;
+    return { result: block.receipts[0].result, events: block.receipts[0].events };
   };
 
   getParameter(sender: Account, parameter: string) {
@@ -33,7 +33,7 @@ export class SDE008ProposalSubmission {
       Tx.contractCall('sde008-proposal-submission', 'get-parameter', [parameter], sender.address),
     ]);
 
-    return block.receipts[0].result;
+    return { result: block.receipts[0].result, events: block.receipts[0].events };
   };
 
   propose(sender: Account, proposal: string, startBlockHeight: string, memberContract: string) {
@@ -41,6 +41,6 @@ export class SDE008ProposalSubmission {
       Tx.contractCall('sde008-proposal-submission', 'propose', [proposal, startBlockHeight, memberContract], sender.address),
     ]);
 
-    return block.receipts[0].result;
+    return { result: block.receipts[0].result, events: block.receipts[0].events };
   };
 };

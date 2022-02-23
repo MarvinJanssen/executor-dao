@@ -24,7 +24,7 @@ export class ExecutorDao {
       Tx.contractCall('executor-dao', 'is-extension', [extension], sender.address),
     ]);
 
-    return block.receipts[0].result;
+    return { result: block.receipts[0].result, events: block.receipts[0].events };
   }
 
   setExtension(sender: Account, extension: any, enabled: string) {
@@ -32,7 +32,7 @@ export class ExecutorDao {
       Tx.contractCall('executor-dao', 'set-extension', [extension, enabled], sender.address),
     ]);
 
-    return block.receipts[0].result;
+    return { result: block.receipts[0].result, events: block.receipts[0].events };
   }
 
   setExtensions(sender: Account, extensionsList: any) {
@@ -40,7 +40,7 @@ export class ExecutorDao {
       Tx.contractCall('executor-dao', 'set-extensions', [extensionsList], sender.address),
     ]);
 
-    return block.receipts[0].result;
+    return { result: block.receipts[0].result, events: block.receipts[0].events };
   }
 
   executedAt(sender: Account, proposal: any) {
@@ -48,7 +48,7 @@ export class ExecutorDao {
       Tx.contractCall('executor-dao', 'executed-at', [proposal], sender.address),
     ]);
 
-    return block.receipts[0].result;
+    return { result: block.receipts[0].result, events: block.receipts[0].events };
   }
 
   execute(sender: Account, proposal: any) {
@@ -56,7 +56,7 @@ export class ExecutorDao {
       Tx.contractCall('executor-dao', 'execute', [proposal, types.principal(sender.address)], sender.address),
     ]);
 
-    return block.receipts[0].result;
+    return { result: block.receipts[0].result, events: block.receipts[0].events };
   }
 
   initialize(sender: Account) {
@@ -64,7 +64,7 @@ export class ExecutorDao {
       Tx.contractCall('executor-dao', 'initialize', [types.principal(PROPOSALS.sdp000Bootstrap)], sender.address),
     ]);
 
-    return block.receipts[0].result;
+    return { result: block.receipts[0].result, events: block.receipts[0].events };
   }
 
   requestExtensionCallback(sender: Account, extension: any, memo: string) {
@@ -72,6 +72,6 @@ export class ExecutorDao {
       Tx.contractCall('executor-dao', 'request-extension-callback', [extension, memo], sender.address),
     ]);
 
-    return block.receipts[0].result;
+    return { result: block.receipts[0].result, events: block.receipts[0].events };
   }
 }

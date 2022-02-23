@@ -75,6 +75,7 @@
 	(let ((sender tx-sender))
 		(asserts! (is-eq sender (var-get executive)) ERR_UNAUTHORIZED)
 		(var-set executive (as-contract tx-sender))
+		(print {event: "initialize", proposal: proposal})
 		(as-contract (execute proposal sender))
 	)
 )

@@ -32,7 +32,7 @@ export class SDE007ProposalVoting {
       Tx.contractCall('sde007-proposal-voting', 'is-member-contract', [memberContract], sender.address),
     ]);
 
-    return block.receipts[0].result;
+    return { result: block.receipts[0].result, events: block.receipts[0].events };
   };
 
   getProposalData(sender: Account, proposal: string) {
@@ -40,7 +40,7 @@ export class SDE007ProposalVoting {
       Tx.contractCall('sde007-proposal-voting', 'get-proposal-data', [proposal], sender.address),
     ]);
 
-    return block.receipts[0].result;
+    return { result: block.receipts[0].result, events: block.receipts[0].events };
   };
 
   vote(sender: Account, voteFor: string, proposal: string, memberContract: string) {
@@ -48,7 +48,7 @@ export class SDE007ProposalVoting {
       Tx.contractCall('sde007-proposal-voting', 'vote', [voteFor, proposal, memberContract], sender.address),
     ]);
 
-    return block.receipts[0].result;
+    return { result: block.receipts[0].result, events: block.receipts[0].events };
   };
 
   conclude(sender: Account, proposal: string) {
@@ -56,6 +56,6 @@ export class SDE007ProposalVoting {
       Tx.contractCall('sde007-proposal-voting', 'conclude', [proposal], sender.address),
     ]);
 
-    return block.receipts[0].result;
+    return { result: block.receipts[0].result, events: block.receipts[0].events };
   };
 };

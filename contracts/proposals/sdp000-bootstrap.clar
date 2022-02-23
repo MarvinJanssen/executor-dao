@@ -55,7 +55,7 @@
 		;; Set blacklisted address.
 		(try! (contract-call? .sde006-membership set-blacklist 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG true))
 
-		(print "It's goin DAOn...")
+		(print "...to be a completely separate network and separate block chain, yet share CPU power with Bitcoin.")
 		(ok true)
 	)
 )

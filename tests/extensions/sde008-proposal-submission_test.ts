@@ -15,11 +15,11 @@ Clarinet.test({
     let deployer = accounts.get('deployer')!;
     let Dao = new ExecutorDao(chain);
     let ProposalSubmission = new SDE008ProposalSubmission(chain);
-    let result: any = null;
+    let data: any = null;
     
     // 1a. should return an error if caller is trying to set member contract from anything other than extension or DAO
-    result = await ProposalSubmission.setMemberContract(deployer, types.principal(EXTENSIONS.sde006Membership));
-    result.expectErr().expectUint(SDE008_PROPOSAL_SUBMISSION_CODES.ERR_UNAUTHORIZED);
+    data = await ProposalSubmission.setMemberContract(deployer, types.principal(EXTENSIONS.sde006Membership));
+    data.result.expectErr().expectUint(SDE008_PROPOSAL_SUBMISSION_CODES.ERR_UNAUTHORIZED);
 
     // 2a. add proposal to change the membership contract address
     // 2b. verify new proposal is added to the proposal queue

@@ -15,7 +15,7 @@ Clarinet.test({
     let deployer = accounts.get('deployer')!;
     let Dao = new ExecutorDao(chain);
     let ProposalVoting = new SDE007ProposalVoting(chain);
-    let result: any = null;
+    let data: any = null;
 
     // TODO: add tests
     
