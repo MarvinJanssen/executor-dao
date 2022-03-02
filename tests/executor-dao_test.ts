@@ -4,9 +4,9 @@ import {
   Clarinet,
   Chain,
   types,
-} from './models/utils/helpers.ts';
+} from './utils/helpers.ts';
 import { ExecutorDao, EXECUTOR_DAO_CODES } from './models/executor-dao-model.ts';
-import { EXTENSIONS, PROPOSALS } from './models/utils/contract-addresses.ts';
+import { EXTENSIONS, PROPOSALS } from './utils/contract-addresses.ts';
 
 Clarinet.test({
   name: 'ExecutorDao',

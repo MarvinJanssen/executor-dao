@@ -15,6 +15,10 @@ export const EXTENSIONS = {
   sde009Safe: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.sde009-safe",
 };
 
+export const TEST_EXTENSIONS = {
+  sde006TestMembership: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.sde006-test-membership",
+};
+
 export const PROPOSALS = {
   sdp000Bootstrap: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.sdp000-bootstrap",
   sdp001DevFund: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.sdp001-dev-fund",
@@ -23,4 +27,8 @@ export const PROPOSALS = {
   sdp004SendFunds: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.sdp004-send-funds",
   sdp005DisableEmergencyProposal: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.sdp005-disable-emergency-proposal",
   sdp006AddMember: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.sdp006-add-member",
+};
+
+export const TEST_PROPOSALS = {
+  sdp008TestProposalSubmission: "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.sdp008-test-proposal-submission",
 };

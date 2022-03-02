@@ -1,13 +1,76 @@
 [project]
 name = "executor-dao"
+authors = []
+description = ""
+telemetry = false
 requirements = []
+[contracts.citycoin-auth]
+path = "contracts/external/citycoins/citycoin-auth.clar"
+depends_on = ["citycoin-core-trait", "citycoin-token-trait"]
 
-[repl]
-costs_version = 2
+[contracts.citycoin-core-trait]
+path = "contracts/external/citycoins/citycoin-core-trait.clar"
+depends_on = []
+
+[contracts.citycoin-core-v1]
+path = "contracts/external/citycoins/citycoin-core-v1.clar"
+depends_on = ["citycoin-auth", "citycoin-token", "citycoin-vrf", "citycoin-core-trait"]
+
+[contracts.citycoin-token]
+path = "contracts/external/citycoins/citycoin-token.clar"
+depends_on = ["sip010-ft-trait", "citycoin-auth", "citycoin-token-trait"]
+
+[contracts.citycoin-token-trait]
+path = "contracts/external/citycoins/citycoin-token-trait.clar"
+depends_on = []
+
+[contracts.citycoin-vrf]
+path = "contracts/external/citycoins/citycoin-vrf.clar"
+depends_on = []
+
+[contracts.executor-dao]
+path = "contracts/executor-dao.clar"
+depends_on = ["proposal-trait", "extension-trait"]
+
+[contracts.extension-trait]
+path = "contracts/traits/extension-trait.clar"
+depends_on = []
+
+[contracts.ft-membership]
+path = "contracts/external/ft-membership.clar"
+depends_on = ["sip010-ft-trait"]
+
+[contracts.governance-token-trait]
+path = "contracts/traits/governance-token-trait.clar"
+depends_on = []
+
+[contracts.member-trait]
+path = "contracts/traits/member-trait.clar"
+depends_on = []
+
+[contracts.nft-escrow]
+path = "contracts/external/nft-escrow.clar"
+depends_on = ["ownable-trait"]
+
+[contracts.nft-membership]
+path = "contracts/external/nft-membership.clar"
+depends_on = ["sip009-nft-trait"]
+
+[contracts.ownable-trait]
+path = "contracts/traits/ownable-trait.clar"
+depends_on = []
+
+[contracts.proposal-trait]
+path = "contracts/traits/proposal-trait.clar"
+depends_on = []
 
 [contracts.sde000-governance-token]
 path = "contracts/extensions/access_control/sde000-governance-token.clar"
 depends_on = ["executor-dao", "governance-token-trait", "sip010-ft-trait"]
+
+[contracts.sde000-test-governance-token]
+path = "contracts/tests/extensions/access_control/sde000-test-governance-token.clar"
+depends_on = ["executor-dao", "governance-token-trait", "sip010-ft-trait", "extension-trait"]
 
 [contracts.sde001-proposal-voting]
 path = "contracts/extensions/sde001-proposal-voting.clar"
@@ -32,6 +95,10 @@ depends_on = ["executor-dao", "extension-trait", "sde000-governance-token"]
 [contracts.sde006-membership]
 path = "contracts/extensions/access_control/sde006-membership.clar"
 depends_on = ["executor-dao", "member-trait", "extension-trait"]
+
+[contracts.sde006-test-membership]
+path = "contracts/tests/extensions/access_control/sde006-test-membership.clar"
+depends_on = []
 
 [contracts.sde007-proposal-voting]
 path = "contracts/extensions/sde007-proposal-voting.clar"
@@ -85,65 +152,9 @@ depends_on = ["proposal-trait"]
 path = "contracts/proposals/sdp006-add-member.clar"
 depends_on = ["proposal-trait"]
 
-[contracts.executor-dao]
-path = "contracts/executor-dao.clar"
-depends_on = ["proposal-trait", "extension-trait"]
-
-[contracts.extension-trait]
-path = "contracts/traits/extension-trait.clar"
-depends_on = []
-
-[contracts.governance-token-trait]
-path = "contracts/traits/governance-token-trait.clar"
-depends_on = []
-
-[contracts.member-trait]
-path = "contracts/traits/member-trait.clar"
-depends_on = []
-
-[contracts.nft-escrow]
-path = "contracts/external/nft-escrow.clar"
-depends_on = ["ownable-trait"]
-
-[contracts.nft-membership]
-path = "contracts/external/nft-membership.clar"
-depends_on = ["sip009-nft-trait"]
-
-[contracts.ft-membership]
-path = "contracts/external/ft-membership.clar"
-depends_on = ["sip010-ft-trait"]
-
-[contracts.citycoin-auth]
-path = "contracts/external/citycoins/citycoin-auth.clar"
-depends_on = ["citycoin-core-trait", "citycoin-token-trait"]
-
-[contracts.citycoin-core-trait]
-path = "contracts/external/citycoins/citycoin-core-trait.clar"
-depends_on = []
-
-[contracts.citycoin-core-v1]
-path = "contracts/external/citycoins/citycoin-core-v1.clar"
-depends_on = ["citycoin-auth", "citycoin-token", "citycoin-vrf", "citycoin-core-trait"]
-
-[contracts.citycoin-token]
-path = "contracts/external/citycoins/citycoin-token.clar"
-depends_on = ["sip010-ft-trait", "citycoin-auth", "citycoin-token-trait"]
-
-[contracts.citycoin-token-trait]
-path = "contracts/external/citycoins/citycoin-token-trait.clar"
-depends_on = []
-
-[contracts.citycoin-vrf]
-path = "contracts/external/citycoins/citycoin-vrf.clar"
-depends_on = []
-
-[contracts.ownable-trait]
-path = "contracts/traits/ownable-trait.clar"
-depends_on = []
-
-[contracts.proposal-trait]
-path = "contracts/traits/proposal-trait.clar"
-depends_on = []
+[contracts.sdp008-test-proposal-submission]
+path = "contracts/tests/proposals/sdp008-test-proposal-submission.clar"
+depends_on = ["proposal-trait", "executor-dao", "sde006-test-membership", "sde006-membership"]
 
 [contracts.sip009-nft-trait]
 path = "contracts/traits/sip009-nft-trait.clar"
@@ -152,3 +163,16 @@ depends_on = []
 [contracts.sip010-ft-trait]
 path = "contracts/traits/sip010-ft-trait.clar"
 depends_on = []
+
+[repl]
+costs_version = 2
+parser_version = 2
+
+[repl.analysis]
+passes = []
+
+[repl.analysis.check_checker]
+strict = false
+trusted_sender = false
+trusted_caller = false
+callee_filter = false

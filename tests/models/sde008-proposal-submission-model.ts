@@ -2,8 +2,8 @@ import {
   Account, 
   Chain, 
   Tx 
-} from './utils/helpers.ts';
-import { PROPOSALS } from './utils/contract-addresses.ts';
+} from '../utils/helpers.ts';
+import { PROPOSALS } from '../utils/contract-addresses.ts';
 
 export enum SDE008_PROPOSAL_SUBMISSION_CODES {
   ERR_UNAUTHORIZED = 3100,
@@ -28,6 +28,38 @@ export class SDE008ProposalSubmission {
     return { result: block.receipts[0].result, events: block.receipts[0].events };
   };
 
+  setParameter(sender: Account, parameter: string, value: string) {
+    let block = this.chain.mineBlock([
+      Tx.contractCall('sde008-proposal-submission', 'set-parameter', [parameter, value], sender.address),
+    ]);
+
+    return { result: block.receipts[0].result, events: block.receipts[0].events };
+  };
+
+  setParameters(sender: Account, list: string) {
+    let block = this.chain.mineBlock([
+      Tx.contractCall('sde008-proposal-submission', 'set-parameters', [list], sender.address),
+    ]);
+
+    return { result: block.receipts[0].result, events: block.receipts[0].events };
+  };
+
+  getMemberContract(sender: Account) {
+    let block = this.chain.mineBlock([
+      Tx.contractCall('sde008-proposal-submission', 'get-member-contract', [], sender.address),
+    ]);
+
+    return { result: block.receipts[0].result, events: block.receipts[0].events };
+  };
+
+  isMemberContract(sender: Account, memberContract: string) {
+    let block = this.chain.mineBlock([
+      Tx.contractCall('sde008-proposal-submission', 'is-member-contract', [memberContract], sender.address),
+    ]);
+
+    return { result: block.receipts[0].result, events: block.receipts[0].events };
+  };
+
   getParameter(sender: Account, parameter: string) {
     let block = this.chain.mineBlock([
       Tx.contractCall('sde008-proposal-submission', 'get-parameter', [parameter], sender.address),
@@ -39,6 +71,14 @@ export class SDE008ProposalSubmission {
   propose(sender: Account, proposal: string, startBlockHeight: string, memberContract: string) {
     let block = this.chain.mineBlock([
       Tx.contractCall('sde008-proposal-submission', 'propose', [proposal, startBlockHeight, memberContract], sender.address),
+    ]);
+
+    return { result: block.receipts[0].result, events: block.receipts[0].events };
+  };
+
+  callback(sender: Account, memo: string) {
+    let block = this.chain.mineBlock([
+      Tx.contractCall('sde008-proposal-submission', 'callback', [memo], sender.address),
     ]);
 
     return { result: block.receipts[0].result, events: block.receipts[0].events };

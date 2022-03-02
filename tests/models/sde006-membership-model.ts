@@ -2,8 +2,8 @@ import {
   Account, 
   Chain, 
   Tx 
-} from './utils/helpers.ts';
-import { PROPOSALS } from './utils/contract-addresses.ts';
+} from '../utils/helpers.ts';
+import { PROPOSALS } from '../utils/contract-addresses.ts';
 
 export enum SDE006_MEMBERSHIP_CODES {
   ERR_UNAUTHORIZED = 2900,

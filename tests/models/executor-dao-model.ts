@@ -3,8 +3,8 @@ import {
   Chain, 
   Tx,
   types,
-} from './utils/helpers.ts';
-import { PROPOSALS } from './utils/contract-addresses.ts';
+} from '../utils/helpers.ts';
+import { PROPOSALS } from '../utils/contract-addresses.ts';
 
 export enum EXECUTOR_DAO_CODES {
   ERR_UNAUTHORIZED = 1000,
