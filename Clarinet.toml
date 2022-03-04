@@ -1,9 +1,23 @@
 [project]
-name = "executor-dao"
+name = "stackerdaos"
 authors = []
 description = ""
 telemetry = false
 requirements = []
+
+[repl]
+costs_version = 2
+parser_version = 2
+
+[repl.analysis]
+passes = []
+
+[repl.analysis.check_checker]
+strict = false
+trusted_sender = false
+trusted_caller = false
+callee_filter = false
+
 [contracts.citycoin-auth]
 path = "contracts/external/citycoins/citycoin-auth.clar"
 depends_on = ["citycoin-core-trait", "citycoin-token-trait"]
@@ -163,16 +177,3 @@ depends_on = []
 [contracts.sip010-ft-trait]
 path = "contracts/traits/sip010-ft-trait.clar"
 depends_on = []
-
-[repl]
-costs_version = 2
-parser_version = 2
-
-[repl.analysis]
-passes = []
-
-[repl.analysis.check_checker]
-strict = false
-trusted_sender = false
-trusted_caller = false
-callee_filter = false
