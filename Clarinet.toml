@@ -1,7 +1,6 @@
 [project]
 name = "executor-dao"
 requirements = []
-costs_version = 2
 
 [contracts.ede000-governance-token]
 path = "contracts/extensions/ede000-governance-token.clar"
