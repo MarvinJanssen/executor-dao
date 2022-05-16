@@ -67,6 +67,7 @@
 	(begin
 		(try! (is-dao-or-extension))
 		(ft-burn? edg-token amount owner)
+		
 	)
 )
 

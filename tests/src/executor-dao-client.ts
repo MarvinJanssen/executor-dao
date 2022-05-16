@@ -8,6 +8,7 @@ import {
 import { assertEquals, assert } from "https://deno.land/std@0.90.0/testing/asserts.ts";
 
 export enum ExecutorDaoErrCode {
+  err_insufficient_balance=1,
   err_unauthorised=1000,
   err_already_executed=1001,
   err_invalid_extension=1002

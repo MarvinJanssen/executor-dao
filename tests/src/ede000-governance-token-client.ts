@@ -7,10 +7,10 @@ import {
 } from "https://deno.land/x/clarinet@v0.28.1/index.ts";
 import { assertEquals, assert } from "https://deno.land/std@0.90.0/testing/asserts.ts";
 
-export enum GovernanceTokenErrCode {
+export enum EDE000GovernanceTokenErrCode {
 }
 
-export class GovernanceTokenClient {
+export class EDE000GovernanceTokenClient {
   contractName: string = "";
   chain: Chain;
   deployer: Account;
@@ -26,12 +26,12 @@ export class GovernanceTokenClient {
     return this.callReadOnlyFn("edg-get-balance", [types.principal(sender)]);
   }
 
-  edgHasPercentageBalance(who: string, factor: number): ReadOnlyFn {
-    return this.callReadOnlyFn("edg-has-percentage-balance", [types.principal(who), types.uint(factor)]);
+  edgGetLocked(sender: string, ): ReadOnlyFn {
+    return this.callReadOnlyFn("edg-get-locked", [types.principal(sender)]);
   }
 
-  edgGetLocked(who: string): ReadOnlyFn {
-    return this.callReadOnlyFn("edg-get-locked", [types.principal(who)]);
+  edgHasPercentageBalance(who: string, factor: number): ReadOnlyFn {
+    return this.callReadOnlyFn("edg-has-percentage-balance", [types.principal(who), types.uint(factor)]);
   }
 
   edgTransfer(amount: number, sender: string, recipient: string, txSender: string): Tx {

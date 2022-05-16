@@ -7,10 +7,10 @@ import {
 } from "https://deno.land/x/clarinet@v0.28.1/index.ts";
 import { assertEquals, assert } from "https://deno.land/std@0.90.0/testing/asserts.ts";
 
-export enum ProposalErrCode {
+export enum EDE004EmergencyExecuteErrCode {
 }
 
-export class ProposalClient {
+export class EDE004EmergencyExecuteClient {
   contractName: string = "";
   chain: Chain;
   deployer: Account;
@@ -21,12 +21,12 @@ export class ProposalClient {
     this.deployer = deployer;
   }
 
-  // proposal-trait
-  execute(sender: string, txSender: string): Tx {
-    return Tx.contractCall(
-      this.contractName,
-      "execute",
-      [types.principal(sender)], txSender);
+  isExecutiveTeamMember(who: string): ReadOnlyFn {
+    return this.callReadOnlyFn("is-executive-team-member", [types.principal(who)]);
+  }
+
+  getSignalsRequired(): ReadOnlyFn {
+    return this.callReadOnlyFn("get-signals-required");
   }
 
   private callReadOnlyFn(
