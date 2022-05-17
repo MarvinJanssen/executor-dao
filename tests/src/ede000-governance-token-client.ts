@@ -8,6 +8,8 @@ import {
 import { assertEquals, assert } from "https://deno.land/std@0.90.0/testing/asserts.ts";
 
 export enum EDE000GovernanceTokenErrCode {
+  err_unauthorised=3000,
+  err_not_token_owner=4
 }
 
 export class EDE000GovernanceTokenClient {
@@ -21,7 +23,58 @@ export class EDE000GovernanceTokenClient {
     this.deployer = deployer;
   }
 
-  // governance-token-trait
+  transfer(amount: number, sender: string, recipient: string, memo: string, txSender: string): Tx {
+    return Tx.contractCall(
+      this.contractName,
+      "transfer",
+      [types.uint(amount), types.principal(sender), types.principal(recipient), (memo && memo.length > 0) ? types.some(types.buff(memo)) : types.none()], txSender);
+  }
+
+  getName(): ReadOnlyFn {
+    return this.callReadOnlyFn("get-name", []);
+  }
+  getSymbol(): ReadOnlyFn {
+    return this.callReadOnlyFn("get-symbol", []);
+  }
+  getTokenUri(): ReadOnlyFn {
+    return this.callReadOnlyFn("get-token-uri", []);
+  }
+  getDecimals(): ReadOnlyFn {
+    return this.callReadOnlyFn("get-decimals", []);
+  }
+  getTotalSupply(): ReadOnlyFn {
+    return this.callReadOnlyFn("get-total-supply", []);
+  }
+  getBalance(who: string): ReadOnlyFn {
+    return this.callReadOnlyFn("get-balance", [types.principal(who)]);
+  }
+
+  setName(value: string, txSender: string): Tx {
+    return Tx.contractCall(
+      this.contractName,
+      "set-name",
+      [types.ascii(value)], txSender);
+  }
+  setSymbol(value: string, txSender: string): Tx {
+    return Tx.contractCall(
+      this.contractName,
+      "set-symbol",
+      [types.ascii(value)], txSender);
+  }
+  setTokenUri(value: string, txSender: string): Tx {
+    return Tx.contractCall(
+      this.contractName,
+      "set-token-uri",
+      [types.some(types.utf8(value))], txSender);
+  }
+  setDecimals(value: number, txSender: string): Tx {
+    return Tx.contractCall(
+      this.contractName,
+      "set-decimals",
+      [types.uint(value)], txSender);
+  }
+
+
   edgGetBalance(sender: string, ): ReadOnlyFn {
     return this.callReadOnlyFn("edg-get-balance", [types.principal(sender)]);
   }

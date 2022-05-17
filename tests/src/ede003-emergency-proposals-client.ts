@@ -8,6 +8,10 @@ import {
 import { assertEquals, assert } from "https://deno.land/std@0.90.0/testing/asserts.ts";
 
 export enum EDE003EmergencyProposalsErrCode {
+  err_unauthorised=3000,
+  err_not_emergency_team_member=3001,
+  err_sunset_height_reached=3002,
+  err_sunset_height_in_past=3003
 }
 
 export class EDE003EmergencyProposalsClient {
@@ -19,6 +23,27 @@ export class EDE003EmergencyProposalsClient {
     this.contractName = contractName;
     this.chain = chain;
     this.deployer = deployer;
+  }
+
+  setEmergencyTeaMmember(who: string, member: boolean, txSender: string): Tx {
+    return Tx.contractCall(
+      this.contractName,
+      "set-emergency-team-member",
+      [types.principal(who), types.bool(member)], txSender);
+  }
+
+  setEmergencyTeamSunsetHeight(height: number, txSender: string): Tx {
+    return Tx.contractCall(
+      this.contractName,
+      "set-emergency-team-sunset-height",
+      [types.uint(height)], txSender);
+  }
+
+  setEmergencyProposalDuration(duration: number, txSender: string): Tx {
+    return Tx.contractCall(
+      this.contractName,
+      "set-emergency-proposal-duration",
+      [types.uint(duration)], txSender);
   }
 
   emergencyPropose(proposal: string, txSender: string): Tx {

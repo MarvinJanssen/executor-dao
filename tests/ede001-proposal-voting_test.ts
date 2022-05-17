@@ -18,7 +18,9 @@ const setup = (chain: Chain, accounts: Map<string, Account>): {
     contractEDP001: string;
     contractEDP002: string;
     contractEDP003: string;
+    contractEDP005: string;
     contractEDE000: string;
+    contractEDE000_1: string;
     contractEDE001: string;
     contractEDE002: string;
     contractEDE003: string;
@@ -45,7 +47,9 @@ const setup = (chain: Chain, accounts: Map<string, Account>): {
     const contractEDP001 = accounts.get("deployer")!.address + '.edp001-dev-fund';
     const contractEDP002 = accounts.get("deployer")!.address + '.edp002-kill-emergency-execute';
     const contractEDP003 = accounts.get("deployer")!.address + '.edp003-whitelist-escrow-nft';
+    const contractEDP005 = accounts.get("deployer")!.address + '.edp005-dao-change-sample-config';
     const contractEDE000 = accounts.get("deployer")!.address + '.ede000-governance-token';
+    const contractEDE000_1 = accounts.get("deployer")!.address + '.ede000-governance-token-v2';
     const contractEDE001 = accounts.get("deployer")!.address + '.ede001-proposal-voting';
     const contractEDE002 = accounts.get("deployer")!.address + '.ede002-proposal-submission';
     const contractEDE003 = accounts.get("deployer")!.address + '.ede003-emergency-proposals';
@@ -65,8 +69,8 @@ const setup = (chain: Chain, accounts: Map<string, Account>): {
     const ede004EmergencyExecuteClient = new EDE004EmergencyExecuteClient(chain, deployer, 'ede004-emergency-execute');
     return {
         administrator, deployer, contractEXD, contractNE,
-        contractEDP000, contractEDP001, contractEDP002, contractEDP003,
-        contractEDE000, contractEDE001, contractEDE002, contractEDE003, contractEDE004, contractEDE005, 
+        contractEDP000, contractEDP001, contractEDP002, contractEDP003, contractEDP005,
+        contractEDE000, contractEDE000_1, contractEDE001, contractEDE002, contractEDE003, contractEDE004, contractEDE005, 
         phil, daisy, bobby, hunter, ward, exeDaoClient, edp000BootstrapClient, 
         ede000GovernanceTokenClient, ede001ProposalVotingClient, ede002ProposalSubmissionClient,
         ede003EmergencyProposalsClient, ede004EmergencyExecuteClient };
@@ -262,7 +266,6 @@ Clarinet.test({
       ede001ProposalVotingClient.vote(500, true, contractEDP003, contractEDE000, bobby.address),
       ede001ProposalVotingClient.vote(1, true, contractEDP003, contractEDE000, bobby.address),
     ]);
-    // console.log('Case 1: ---> ', block)
     block.receipts[0].result.expectOk().expectBool(true)
     block.receipts[1].result.expectErr().expectUint(1)
     ede000GovernanceTokenClient.edgGetLocked(bobby.address).result.expectOk().expectUint(1000)
@@ -566,14 +569,95 @@ Clarinet.test({
     block.receipts[0].result.expectOk().expectBool(true)
     block.receipts[1].result.expectOk().expectBool(true)
     
-
     chain.mineEmptyBlock(1585);
+
     block = chain.mineBlock([
       ede001ProposalVotingClient.conclude(contractEDP001, ward.address),
     ]);
     block.receipts[0].result.expectOk().expectBool(false)
 
     assertProposal(true, false, 500, 500, (getDurations(2, ede002ProposalSubmissionClient).startHeight), getDurations(2, ede002ProposalSubmissionClient).endHeight, phil.address, contractEDP001, ede001ProposalVotingClient)
+  }
+});
+
+Clarinet.test({
+  name: "Ensure same proposal cannot be executed twice.",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    const {
+      deployer, 
+      exeDaoClient,
+      phil, bobby, ward,
+      contractEDP000, 
+      contractEDP001,
+      contractEDE000,
+      ede001ProposalVotingClient,
+      ede002ProposalSubmissionClient
+    } = setup(chain, accounts)
+
+    const startHeight = getDurations(0, ede002ProposalSubmissionClient).startHeight + 2
+    let block = chain.mineBlock([
+      exeDaoClient.construct(contractEDP000, deployer.address),
+      ede002ProposalSubmissionClient.propose(contractEDP001, startHeight, contractEDE000, phil.address),
+    ]);
+    block.receipts[0].result.expectOk().expectBool(true)
+    block.receipts[1].result.expectOk().expectBool(true)
+    assertProposal(false, false, 0, 0, (getDurations(block.height, ede002ProposalSubmissionClient).startHeight), getDurations(block.height, ede002ProposalSubmissionClient).endHeight, phil.address, contractEDP001, ede001ProposalVotingClient)
+
+    chain.mineEmptyBlock(startHeight);
+
+    block = chain.mineBlock([
+      ede001ProposalVotingClient.vote(500, true, contractEDP001, contractEDE000, bobby.address),
+    ]);
+    block.receipts[0].result.expectOk().expectBool(true)
+    
+    chain.mineEmptyBlock(1585);
+    block = chain.mineBlock([
+      ede001ProposalVotingClient.conclude(contractEDP001, ward.address),
+    ]);
+    block.receipts[0].result.expectOk().expectBool(true)
+    block = chain.mineBlock([
+      ede002ProposalSubmissionClient.propose(contractEDP001, 1880, contractEDE000, phil.address),
+    ]);
+    block.receipts[0].result.expectErr().expectUint(EDE001ProposalVotingErrCode.err_proposal_already_executed)
+
+    assertProposal(true, true, 0, 500, (getDurations(2, ede002ProposalSubmissionClient).startHeight), getDurations(2, ede002ProposalSubmissionClient).endHeight, phil.address, contractEDP001, ede001ProposalVotingClient)
+  }
+});
+
+Clarinet.test({
+  name: "Ensure same proposal cannot be proposed twice.",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    const {
+      deployer, 
+      exeDaoClient,
+      phil, bobby,
+      contractEDP000, 
+      contractEDP001,
+      contractEDE000,
+      ede001ProposalVotingClient,
+      ede002ProposalSubmissionClient
+    } = setup(chain, accounts)
+
+    const startHeight = getDurations(0, ede002ProposalSubmissionClient).startHeight + 2
+    let block = chain.mineBlock([
+      exeDaoClient.construct(contractEDP000, deployer.address),
+      ede002ProposalSubmissionClient.propose(contractEDP001, startHeight, contractEDE000, phil.address),
+    ]);
+    block.receipts[0].result.expectOk().expectBool(true)
+    block.receipts[1].result.expectOk().expectBool(true)
+    assertProposal(false, false, 0, 0, (getDurations(block.height, ede002ProposalSubmissionClient).startHeight), getDurations(block.height, ede002ProposalSubmissionClient).endHeight, phil.address, contractEDP001, ede001ProposalVotingClient)
+
+    chain.mineEmptyBlock(startHeight);
+
+    block = chain.mineBlock([
+      ede001ProposalVotingClient.vote(500, true, contractEDP001, contractEDE000, bobby.address),
+    ]);
+    block.receipts[0].result.expectOk().expectBool(true)
+    
+    block = chain.mineBlock([
+      ede002ProposalSubmissionClient.propose(contractEDP001, 295, contractEDE000, phil.address),
+    ]);
+    block.receipts[0].result.expectErr().expectUint(EDE001ProposalVotingErrCode.err_proposal_already_exists)
   }
 });
 
@@ -614,9 +698,11 @@ Clarinet.test({
     block = chain.mineBlock([
       ede001ProposalVotingClient.conclude(contractEDP001, ward.address),
       ede001ProposalVotingClient.reclaimVotes(contractEDP001, contractEDE000, bobby.address),
+      ede001ProposalVotingClient.reclaimVotes(contractEDP001, contractEDE000, phil.address),
     ]);
     block.receipts[0].result.expectOk().expectBool(true)
     block.receipts[1].result.expectOk().expectBool(true)
+    block.receipts[2].result.expectErr().expectUint(EDE001ProposalVotingErrCode.err_no_votes_to_return)
 
     assertProposal(true, true, 0, 500, (getDurations(2, ede002ProposalSubmissionClient).startHeight), getDurations(2, ede002ProposalSubmissionClient).endHeight, phil.address, contractEDP001, ede001ProposalVotingClient)
   }
@@ -683,3 +769,54 @@ Clarinet.test({
   }
 });
 
+Clarinet.test({
+  name: "Ensure a proposal can be voted in to e.g. change the governance token used by the dao and to change dao configuration settings in general.",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    const {
+      deployer, 
+      exeDaoClient,
+      phil, bobby, ward,
+      contractEDP000, 
+      contractEDP005,
+      contractEDE000,
+      ede001ProposalVotingClient,
+      ede002ProposalSubmissionClient,
+      ede003EmergencyProposalsClient,
+      ede004EmergencyExecuteClient
+    } = setup(chain, accounts)
+
+    const startHeight = getDurations(0, ede002ProposalSubmissionClient).startHeight + 2
+    let block = chain.mineBlock([
+      exeDaoClient.construct(contractEDP000, deployer.address),
+      ede002ProposalSubmissionClient.propose(contractEDP005, startHeight, contractEDE000, phil.address),
+    ]);
+    block.receipts[0].result.expectOk().expectBool(true)
+    block.receipts[1].result.expectOk().expectBool(true)
+    assertProposal(false, false, 0, 0, (getDurations(block.height, ede002ProposalSubmissionClient).startHeight), getDurations(block.height, ede002ProposalSubmissionClient).endHeight, phil.address, contractEDP005, ede001ProposalVotingClient)
+
+    chain.mineEmptyBlock(startHeight);
+
+    block = chain.mineBlock([
+      ede001ProposalVotingClient.vote(500, true, contractEDP005, contractEDE000, bobby.address),
+      ede001ProposalVotingClient.reclaimVotes(contractEDP005, contractEDE000, bobby.address),
+    ]);
+    block.receipts[0].result.expectOk().expectBool(true)
+    block.receipts[1].result.expectErr().expectUint(EDE001ProposalVotingErrCode.err_proposal_not_concluded)
+    
+    chain.mineEmptyBlock(1585);
+
+    ede003EmergencyProposalsClient.isEmergencyTeamMember('ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC').result.expectBool(false)
+    ede004EmergencyExecuteClient.getSignalsRequired().result.expectUint(3)
+
+    block = chain.mineBlock([
+      ede001ProposalVotingClient.conclude(contractEDP005, ward.address),
+    ]);
+    block.receipts[0].result.expectOk().expectBool(true)
+
+    assert(ede001ProposalVotingClient.getGovernanceToken().result === 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.ede000-governance-token-v2')
+    assert(ede002ProposalSubmissionClient.getGovernanceToken().result === 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.ede000-governance-token-v2')
+    ede003EmergencyProposalsClient.isEmergencyTeamMember('ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC').result.expectBool(true)
+    ede004EmergencyExecuteClient.getSignalsRequired().result.expectUint(2)
+    ede002ProposalSubmissionClient.getParameter("minimum-proposal-start-delay").result.expectOk().expectUint(288)
+  }
+});

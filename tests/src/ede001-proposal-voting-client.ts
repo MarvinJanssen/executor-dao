@@ -41,6 +41,10 @@ export class EDE001ProposalVotingClient {
     return this.callReadOnlyFn("get-proposal-data", [types.principal(proposal)]);
   }
 
+  getGovernanceToken(): ReadOnlyFn {
+    return this.callReadOnlyFn("get-governance-token", []);
+  }
+
   vote(amount: number, _for: boolean, proposal: string, governanceToken: string, txSender: string): Tx {
     return Tx.contractCall(
       this.contractName,
