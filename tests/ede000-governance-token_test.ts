@@ -313,7 +313,7 @@ Clarinet.test({
       ede000GovernanceTokenClient.edgGetLocked(phil.address).result.expectOk().expectUint(1485)
       ede000GovernanceTokenClient.edgGetBalance(daisy.address).result.expectOk().expectUint(1010)
       ede000GovernanceTokenClient.edgGetBalance(ward.address).result.expectOk().expectUint(490)
-      ede000GovernanceTokenClient.edgGetLocked(ward.address).result.expectOk().expectUint(485)
+      ede000GovernanceTokenClient.edgGetLocked(ward.address).result.expectOk().expectUint(490)
 
       ede000GovernanceTokenClient.getTotalSupply().result.expectOk().expectUint(10400)
     }
