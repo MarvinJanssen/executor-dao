@@ -51,7 +51,7 @@ const getDurations = (blockHeight: number, submissionClient: EDE002ProposalSubmi
     
   Clarinet.test({
     name: "Ensure the governance token can't be reset without permission",
-    async fn(chain: Chain, accounts: Map<string, Account>) {
+    fn(chain: Chain, accounts: Map<string, Account>) {
       const { 
         deployer, 
         exeDaoClient,
@@ -72,7 +72,7 @@ const getDurations = (blockHeight: number, submissionClient: EDE002ProposalSubmi
   
   Clarinet.test({
     name: "Ensure voting restrictions pre setting any proposals",
-    async fn(chain: Chain, accounts: Map<string, Account>) {
+    fn(chain: Chain, accounts: Map<string, Account>) {
       const { 
         deployer, 
         exeDaoClient,
@@ -105,7 +105,7 @@ const getDurations = (blockHeight: number, submissionClient: EDE002ProposalSubmi
   
   Clarinet.test({
   name: "Ensure balance of edg tokens respected when voting on single (emergency) proposal",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer, 
       exeDaoClient,
@@ -150,7 +150,7 @@ const getDurations = (blockHeight: number, submissionClient: EDE002ProposalSubmi
 
 Clarinet.test({
   name: "Ensure balance of edg tokens respected when voting across multiple (emergency + 003) proposals",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer, 
       exeDaoClient,
@@ -210,7 +210,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure votes before start height or after end height are rejected.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer, 
       exeDaoClient,
@@ -254,7 +254,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure voting balance reflects two voters voting in opposition.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer, 
       exeDaoClient,
@@ -316,7 +316,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure voting balance reflects three voters voting on two proposals.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer, 
       exeDaoClient,
@@ -378,7 +378,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure cannot conclude before end height is reached or after conclusion.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer, 
       exeDaoClient,
@@ -419,7 +419,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure proposal a passes and proposal b fails to pass.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer, 
       exeDaoClient,
@@ -475,7 +475,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure proposal fails if vote for and against are equal.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer, 
       exeDaoClient,
@@ -518,7 +518,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure same proposal cannot be executed twice.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer, 
       exeDaoClient,
@@ -562,7 +562,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure same proposal cannot be proposed twice.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer, 
       exeDaoClient,
@@ -599,7 +599,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure user can reclaim their votes only after conclusion.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer, 
       exeDaoClient,
@@ -646,7 +646,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure user can reclaim their votes after conclusion and vote for another proposal in same transaction.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer, 
       exeDaoClient,
@@ -707,7 +707,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure a proposal can be voted in to e.g. change the governance token used by the dao and to change dao configuration settings in general.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer, 
       exeDaoClient,

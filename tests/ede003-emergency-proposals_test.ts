@@ -7,7 +7,7 @@ const utils = new Utils();
 
 Clarinet.test({
     name: "Ensure emergency proposals parameters cant be changed without an emergancy proposal.",
-    async fn(chain: Chain, accounts: Map<string, Account>) {
+    fn(chain: Chain, accounts: Map<string, Account>) {
       const {
         deployer, 
         exeDaoClient,
@@ -31,7 +31,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure emergency proposal can only be proposed by an emergency team member ",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const { 
       deployer, 
       exeDaoClient,
@@ -59,7 +59,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure emergency proposal can only be proposed before sunset",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const { 
       deployer,
       exeDaoClient,
@@ -88,7 +88,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure emergency proposal can be proposed",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const { 
       deployer,
       exeDaoClient,

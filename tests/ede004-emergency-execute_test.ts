@@ -8,7 +8,7 @@ const utils = new Utils();
 
 Clarinet.test({
   name: "Ensure extension parameters cannot be changed without authority.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer, 
       exeDaoClient,
@@ -41,7 +41,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure only executive team members can take an executive action.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer, 
       exeDaoClient,
@@ -65,7 +65,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure executive team members cant signal multiple times on same proposal.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer, 
       exeDaoClient,
@@ -101,7 +101,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure settings on the emergency execute extension can be changed via a proposal.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer, 
       exeDaoClient,
@@ -144,7 +144,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure same proposal cat be executed twice.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer, 
       exeDaoClient,
@@ -185,7 +185,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure an extension can be switched off via an emergency execute.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer, 
       exeDaoClient,

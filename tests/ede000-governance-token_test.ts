@@ -68,7 +68,7 @@ const assertProposal = (
 
 Clarinet.test({
     name: "Ensure edg cant be transferred if tx sender is not the owner or the dao.",
-    async fn(chain: Chain, accounts: Map<string, Account>) {
+    fn(chain: Chain, accounts: Map<string, Account>) {
       const {
         deployer, 
         exeDaoClient,
@@ -94,7 +94,7 @@ Clarinet.test({
   
 Clarinet.test({
     name: "Ensure transferring edg leads to correct balance sheet.",
-    async fn(chain: Chain, accounts: Map<string, Account>) {
+    fn(chain: Chain, accounts: Map<string, Account>) {
       const {
         deployer, 
         exeDaoClient,
@@ -123,7 +123,7 @@ Clarinet.test({
   
 Clarinet.test({
     name: "Ensure owner cant directly transfer edg tokens.",
-    async fn(chain: Chain, accounts: Map<string, Account>) {
+    fn(chain: Chain, accounts: Map<string, Account>) {
       const {
         deployer, 
         exeDaoClient,
@@ -153,7 +153,7 @@ Clarinet.test({
   
 Clarinet.test({
   name: "Ensure dao contract deployer cant directly mint edg tokens.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer, 
       exeDaoClient,
@@ -183,7 +183,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure dao contract deployer cant directly burn edg tokens.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer, 
       exeDaoClient,
@@ -213,7 +213,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure dao contract deployer cant directly lock/unlock edg tokens.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer, 
       exeDaoClient,
@@ -245,7 +245,7 @@ Clarinet.test({
 
 Clarinet.test({
     name: "Ensure dao contract deployer cant directly change the sip 010 settings on the governance contract.",
-    async fn(chain: Chain, accounts: Map<string, Account>) {
+    fn(chain: Chain, accounts: Map<string, Account>) {
       const {
         deployer, 
         exeDaoClient,
@@ -273,7 +273,7 @@ Clarinet.test({
   
 Clarinet.test({
     name: "Ensure sip 010 settings on the governance contract can be changed via a proposal.",
-    async fn(chain: Chain, accounts: Map<string, Account>) {
+    fn(chain: Chain, accounts: Map<string, Account>) {
       const {
         deployer, 
         exeDaoClient,
@@ -326,7 +326,7 @@ Clarinet.test({
   
   Clarinet.test({
     name: "Ensure edg tokens can be minted via a proposal.",
-    async fn(chain: Chain, accounts: Map<string, Account>) {
+    fn(chain: Chain, accounts: Map<string, Account>) {
       const { contractEDP006, bobby, deployer, phil, daisy, ward, ede000GovernanceTokenClient } = utils.setup(chain, accounts)
       utils.passProposal(true, utils, chain, accounts, contractEDP006)
       ede000GovernanceTokenClient.edgGetBalance(bobby.address).result.expectOk().expectUint(3000)
@@ -342,7 +342,7 @@ Clarinet.test({
 
   Clarinet.test({
     name: "Ensure edg tokens can be burned via a proposal.",
-    async fn(chain: Chain, accounts: Map<string, Account>) {
+    fn(chain: Chain, accounts: Map<string, Account>) {
       const { contractEDP006, bobby, deployer, phil, daisy, ward, ede000GovernanceTokenClient } = utils.setup(chain, accounts)
       utils.passProposal(true, utils, chain, accounts, contractEDP006)
       ede000GovernanceTokenClient.edgGetBalance(bobby.address).result.expectOk().expectUint(3000)
@@ -358,7 +358,7 @@ Clarinet.test({
 
   Clarinet.test({
     name: "Ensure edg tokens can be transferred via a proposal.",
-    async fn(chain: Chain, accounts: Map<string, Account>) {
+    fn(chain: Chain, accounts: Map<string, Account>) {
       const { contractEDP006, bobby, deployer, phil, daisy, ward, ede000GovernanceTokenClient } = utils.setup(chain, accounts)
       utils.passProposal(true, utils, chain, accounts, contractEDP006)
       ede000GovernanceTokenClient.edgGetBalance(bobby.address).result.expectOk().expectUint(3000)
@@ -374,7 +374,7 @@ Clarinet.test({
 
   Clarinet.test({
     name: "Ensure edg tokens can be locked via a proposal.",
-    async fn(chain: Chain, accounts: Map<string, Account>) {
+    fn(chain: Chain, accounts: Map<string, Account>) {
       const { contractEDP006, bobby, deployer, phil, daisy, ward, ede000GovernanceTokenClient } = utils.setup(chain, accounts)
       utils.passProposal(true, utils, chain, accounts, contractEDP006)
       ede000GovernanceTokenClient.edgGetBalance(bobby.address).result.expectOk().expectUint(3000)

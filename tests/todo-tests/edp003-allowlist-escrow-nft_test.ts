@@ -1,6 +1,6 @@
 import { Clarinet, Chain, Account } from "https://deno.land/x/clarinet@v0.28.1/index.ts";
 
-const setup = (chain: Chain, accounts: Map<string, Account>): {
+const setup = (accounts: Map<string, Account>): {
   administrator: Account;
   deployer: Account;
   contractEXD: string;
@@ -17,9 +17,7 @@ const setup = (chain: Chain, accounts: Map<string, Account>): {
 
 Clarinet.test({
     name: "Ensure edg cant be transferred if tx sender is not the owner or the dao.",
-    async fn(chain: Chain, accounts: Map<string, Account>) {
-      const {
-      } = setup(chain, accounts)
+    fn(chain: Chain, accounts: Map<string, Account>) {
   
       // TODO test proposal
     }

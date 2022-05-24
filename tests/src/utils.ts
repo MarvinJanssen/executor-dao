@@ -68,7 +68,7 @@ export class Utils {
     hunter: Account;
     ward: Account;
     contractEXD: string;
-    contractNE: string;
+    contractNftEscrow: string;
     contractEDP000: string;
     contractEDP001: string;
     contractEDP001_1: string;
@@ -97,7 +97,7 @@ export class Utils {
     const administrator = accounts.get("deployer")!;
     const deployer = accounts.get("deployer")!;
     const contractEXD = accounts.get("deployer")!.address + '.executor-dao';
-    const contractNE = accounts.get("deployer")!.address + '.nft-escrow';
+    const contractNftEscrow = accounts.get("deployer")!.address + '.nft-escrow';
     const contractEDP000 = accounts.get("deployer")!.address + '.edp000-bootstrap';
     const contractEDP001 = accounts.get("deployer")!.address + '.edp001-dev-fund';
     const contractEDP001_1 = accounts.get("deployer")!.address + '.edp001-1-dev-fund';
@@ -136,7 +136,7 @@ export class Utils {
         hunter, 
         ward, 
         contractEXD, 
-        contractNE, 
+        contractNftEscrow, 
         contractEDP000, 
         contractEDP001, 
         contractEDP001_1, 

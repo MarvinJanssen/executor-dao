@@ -7,7 +7,7 @@ const utils = new Utils();
 
 Clarinet.test({
   name: "Ensure proposal rejected if it starts too soon.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer, 
       exeDaoClient,
@@ -33,7 +33,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure proposal rejected if it ends too late.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer, 
       exeDaoClient,
@@ -59,7 +59,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure only the dao or an extension can set a governance token.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer,
       exeDaoClient,
@@ -79,7 +79,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure the dao only accepts proposals with the active governance token.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer,
       exeDaoClient,
@@ -104,7 +104,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure the dao rejects proposals from users whose governance token balance is less than propose-factor.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer,
       hunter,
@@ -133,7 +133,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure initial parameter setup as bootstrapped .",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer,
       exeDaoClient,
@@ -155,10 +155,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure governance token and parameter values can be changed via a proposal.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
-    const {
-    } = utils.setup(chain, accounts)
-
+  fn() {
     console.log('see proposal-voting_test -> <Ensure a proposal can be voted in to e.g. change the governance token used by the dao and to change dao congiuration settings in general.>')
   }
 });

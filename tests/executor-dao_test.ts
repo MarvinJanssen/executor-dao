@@ -8,21 +8,21 @@ const utils = new Utils();
   
 Clarinet.test({
   name: "Ensure nothing works prior to construction",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
-    const { deployer, contractNE, phil, exeDaoClient } = utils.setup(chain, accounts);
-    let block = chain.mineBlock([
+ fn(chain: Chain, accounts: Map<string, Account>) {
+    const { deployer, contractNftEscrow, phil, exeDaoClient } = utils.setup(chain, accounts);
+    const block = chain.mineBlock([
       exeDaoClient.setExtension(phil.address, false, deployer.address),
-      exeDaoClient.setExtension(contractNE, true, deployer.address),
+      exeDaoClient.setExtension(contractNftEscrow, true, deployer.address),
     ]);
     block.receipts[0].result.expectErr().expectUint(ExecutorDaoErrCode.err_unauthorised)
     block.receipts[1].result.expectErr().expectUint(ExecutorDaoErrCode.err_unauthorised)
-    exeDaoClient.isExtension(contractNE).result.expectBool(false)
+    exeDaoClient.isExtension(contractNftEscrow).result.expectBool(false)
   }
 });
 
 Clarinet.test({
   name: "Ensure can't construct the dao with improper inputs",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const { deployer, phil, exeDaoClient, contractEDE000, contractEDP001 } = utils.setup(chain, accounts)
     
     let block = chain.mineBlock([
@@ -53,7 +53,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure can construct the dao with the bootstrap proposal and verify initial setup",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const { 
       deployer, 
       exeDaoClient, 
@@ -63,7 +63,7 @@ Clarinet.test({
       ede004EmergencyExecuteClient 
     } = utils.setup(chain, accounts)
     
-    let block = chain.mineBlock([
+    const block = chain.mineBlock([
       exeDaoClient.construct(contractEDP000, deployer.address)
     ]);
     block.receipts[0].result.expectOk().expectBool(true)

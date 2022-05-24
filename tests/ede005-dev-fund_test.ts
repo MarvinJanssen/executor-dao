@@ -1,4 +1,6 @@
+// @ts-ignore
 import { Clarinet, Chain, Account } from "https://deno.land/x/clarinet@v0.28.1/index.ts";
+// @ts-ignore
 import { assert, assertEquals } from 'https://deno.land/std@0.90.0/testing/asserts.ts';
 import { EDE005DevFundClient, EDE005DevFundErrCode } from "./src/ede005-dev-fund-client.ts";
 import { Utils } from "./src/utils.ts";
@@ -7,23 +9,25 @@ const utils = new Utils();
 
 const attemptClaim = (i: number, amount: number, chain: Chain, block: any, toHeight: number, expect: boolean, ede005DevFundClient: EDE005DevFundClient, address: string): any => {
   chain.mineEmptyBlockUntil(toHeight);
+
   block = chain.mineBlock([
     ede005DevFundClient.claim('I cannot claim the funds', address),
   ]);
   block.receipts[0].result.expectErr().expectUint(EDE005DevFundErrCode.err_already_claimed)
+
   block = chain.mineBlock([
     ede005DevFundClient.claim('I can claim the funds', address),
   ]);
-  // let maxClaims = ede005DevFundClient.getMaxClaims().result
-  let claim = ede005DevFundClient.getDeveloperClaimCount(address).result
-  assert(block.receipts[0].events[0].ft_transfer_event.amount == amount)
-  // console.log(i + ' : Block height: ' + block.height + ' Claim count: ' + claim + ' Transferring: ', block.receipts[0].events[0].ft_transfer_event.amount + ' Result: ' + block.receipts[0].result.expectOk())
   block.receipts[0].result.expectOk().expectBool(expect)
+  // let maxClaims = ede005DevFundClient.getMaxClaims().result
+  ede005DevFundClient.getDeveloperClaimCount(address).result.expectUint(i)
+  assert(block.receipts[0].events[0].ft_transfer_event.amount == amount)
+  //console.log(i + ' : Block height: ' + block.height + ' Claim count: ' + claim + ' Transferring: ', block.receipts[0].events[0].ft_transfer_event.amount + ' Result: ' + block.receipts[0].result.expectOk())
 }
 
 Clarinet.test({
   name: "Ensure dev fund is not a valid extension before proposal 005.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       daisy,
       bobby,
@@ -40,7 +44,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure dev fund is a valid extension after proposal 005.",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       daisy,
       bobby,
@@ -61,7 +65,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure developer cant claim if their address is not registered",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       phil,
       contractEDE005,
@@ -87,7 +91,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure contract owner cannot transfer tokens",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer,
       bobby,
@@ -109,7 +113,7 @@ Clarinet.test({
 });
 Clarinet.test({
   name: "Ensure edg owner cannot transfer tokens",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       daisy,
       bobby,
@@ -132,7 +136,7 @@ Clarinet.test({
 });
 Clarinet.test({
   name: "Ensure developer can only claim once per interval",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       bobby,
       contractEDE005,
@@ -157,7 +161,7 @@ Clarinet.test({
 });
 Clarinet.test({
   name: "Ensure developer cant claim with 0 allowance",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       bobby,
       contractEDP001,
@@ -182,7 +186,7 @@ Clarinet.test({
 });
 Clarinet.test({
   name: "Ensure developer can be removed from dev fund",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       bobby,
       contractEDP001,
@@ -203,7 +207,7 @@ Clarinet.test({
 });
 Clarinet.test({
   name: "Ensure developer can be added to dev fund",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       hunter,
       contractEDP001,
@@ -225,7 +229,7 @@ Clarinet.test({
 
 Clarinet.test({
   name: "Ensure the dao can transfer edg tokens thorugh the dev fund transfer via a proposal",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
+  fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       ward,
       contractEDP001,
@@ -234,13 +238,13 @@ Clarinet.test({
       ede000GovernanceTokenClient
     } = utils.setup(chain, accounts);
 
-    let block = utils.passProposal(true, utils, chain, accounts, contractEDP001)
+    utils.passProposal(true, utils, chain, accounts, contractEDP001)
 
     ede005DevFundClient.getDeveloperAllowance(ward.address).result.expectUint(0)
 
     chain.mineEmptyBlock(1250);
 
-    block = utils.passProposal(false, utils, chain, accounts, contractEDP001_1)
+    utils.passProposal(false, utils, chain, accounts, contractEDP001_1)
 
     ede005DevFundClient.getDeveloperAllowance(ward.address).result.expectUint(1)
     ede000GovernanceTokenClient.edgGetBalance(ward.address).result.expectOk().expectUint(500)
