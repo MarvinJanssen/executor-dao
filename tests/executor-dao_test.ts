@@ -1,72 +1,15 @@
 
 import { Clarinet, Chain, Account } from "https://deno.land/x/clarinet@v0.28.1/index.ts";
 import { assert, assertEquals } from 'https://deno.land/std@0.90.0/testing/asserts.ts';
-import { ExecutorDaoClient, ExecutorDaoErrCode } from "./src/executor-dao-client.ts";
-import { EDP000BootstrapClient, EDP000BootstrapErrCode } from "./src/edp000-bootstrap-client.ts";
-import { EDE000GovernanceTokenClient, EDE000GovernanceTokenErrCode } from "./src/ede000-governance-token-client.ts";
-import { EDE003EmergencyProposalsClient, EDE003EmergencyProposalsErrCode } from "./src/ede003-emergency-proposals-client.ts";
-import { EDE004EmergencyExecuteClient, EDE004EmergencyExecuteErrCode } from "./src/ede004-emergency-execute-client.ts";
+import { ExecutorDaoErrCode } from "./src/executor-dao-client.ts";
+import { Utils } from "./src/utils.ts";
 
-const setup = (chain: Chain, accounts: Map<string, Account>): {
-    administrator: Account;
-    deployer: Account;
-    contractEXD: string;
-    contractNE: string;
-    contractEDP000: string;
-    contractEDP001: string;
-    contractEDP002: string;
-    contractEDP003: string;
-    contractEDE000: string;
-    contractEDE001: string;
-    contractEDE002: string;
-    contractEDE003: string;
-    contractEDE004: string;
-    contractEDE005: string;
-    phil: Account;
-    daisy: Account;
-    bobby: Account;
-    hunter: Account;
-    exeDaoClient: ExecutorDaoClient;
-    edp000BootstrapClient: EDP000BootstrapClient;
-    ede000GovernanceTokenClient: EDE000GovernanceTokenClient;
-    ede003EmergencyProposalsClient: EDE003EmergencyProposalsClient;
-    ede004EmergencyExecuteClient: EDE004EmergencyExecuteClient;
-  } => {
-    const administrator = accounts.get("deployer")!;
-    const deployer = accounts.get("deployer")!;
-    const contractEXD = accounts.get("deployer")!.address + '.executor-dao';
-    const contractNE = accounts.get("deployer")!.address + '.nft-escrow';
-    const contractEDP000 = accounts.get("deployer")!.address + '.edp000-bootstrap';
-    const contractEDP001 = accounts.get("deployer")!.address + '.edp001-dev-fund';
-    const contractEDP002 = accounts.get("deployer")!.address + '.edp002-kill-emergency-execute';
-    const contractEDP003 = accounts.get("deployer")!.address + '.edp003-whitelist-escrow-nft';
-    const contractEDE000 = accounts.get("deployer")!.address + '.ede000-governance-token';
-    const contractEDE001 = accounts.get("deployer")!.address + '.ede001-proposal-voting';
-    const contractEDE002 = accounts.get("deployer")!.address + '.ede002-proposal-submission';
-    const contractEDE003 = accounts.get("deployer")!.address + '.ede003-emergency-proposals';
-    const contractEDE004 = accounts.get("deployer")!.address + '.ede004-emergency-execute';
-    const contractEDE005 = accounts.get("deployer")!.address + '.ede005-dev-fund';
-    const phil = accounts.get("wallet_1")!;
-    const daisy = accounts.get("wallet_2")!;
-    const bobby = accounts.get("wallet_3")!;
-    const hunter = accounts.get("wallet_4")!;
-    const exeDaoClient = new ExecutorDaoClient(chain, deployer, 'executor-dao');
-    const edp000BootstrapClient = new EDP000BootstrapClient(chain, deployer, 'edp000-bootstrap');
-    const ede000GovernanceTokenClient = new EDE000GovernanceTokenClient(chain, deployer, 'ede000-governance-token');
-    const ede003EmergencyProposalsClient = new EDE003EmergencyProposalsClient(chain, deployer, 'ede003-emergency-proposals');
-    const ede004EmergencyExecuteClient = new EDE004EmergencyExecuteClient(chain, deployer, 'ede004-emergency-execute');
-    return { 
-        administrator, deployer, contractEXD, contractNE,
-        contractEDP000, contractEDP001, contractEDP002, contractEDP003,
-        contractEDE000, contractEDE001, contractEDE002, contractEDE003, contractEDE004, contractEDE005, 
-        phil, daisy, bobby, hunter, exeDaoClient, edp000BootstrapClient, ede000GovernanceTokenClient,
-        ede003EmergencyProposalsClient, ede004EmergencyExecuteClient };
-  };
+const utils = new Utils();
   
 Clarinet.test({
   name: "Ensure nothing works prior to construction",
   async fn(chain: Chain, accounts: Map<string, Account>) {
-    const { deployer, contractNE, phil, exeDaoClient } = setup(chain, accounts);
+    const { deployer, contractNE, phil, exeDaoClient } = utils.setup(chain, accounts);
     let block = chain.mineBlock([
       exeDaoClient.setExtension(phil.address, false, deployer.address),
       exeDaoClient.setExtension(contractNE, true, deployer.address),
@@ -80,7 +23,7 @@ Clarinet.test({
 Clarinet.test({
   name: "Ensure can't construct the dao with improper inputs",
   async fn(chain: Chain, accounts: Map<string, Account>) {
-    const { deployer, phil, exeDaoClient, ede000GovernanceTokenClient, contractEDP000, contractEDE000, contractEDP001 } = setup(chain, accounts)
+    const { deployer, phil, exeDaoClient, contractEDE000, contractEDP001 } = utils.setup(chain, accounts)
     
     let block = chain.mineBlock([
       exeDaoClient.construct(phil.address, deployer.address)
@@ -118,7 +61,7 @@ Clarinet.test({
       contractEDP000, 
       ede003EmergencyProposalsClient, 
       ede004EmergencyExecuteClient 
-    } = setup(chain, accounts)
+    } = utils.setup(chain, accounts)
     
     let block = chain.mineBlock([
       exeDaoClient.construct(contractEDP000, deployer.address)

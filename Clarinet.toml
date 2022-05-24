@@ -47,6 +47,10 @@ depends_on = ["proposal-trait", "nft-escrow"]
 path = "tests/proposals/ede000-governance-token-v2.clar"
 depends_on = ["executor-dao", "governance-token-trait", "sip010-ft-trait"]
 
+[contracts.edp001-1-dev-fund]
+path = "tests/proposals/edp001-1-dev-fund.clar"
+depends_on = ["ede000-governance-token", "executor-dao"]
+
 [contracts.edp005-dao-change-sample-config]
 path = "tests/proposals/edp005-dao-change-sample-config.clar"
 depends_on = ["proposal-trait"]

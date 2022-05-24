@@ -11,7 +11,8 @@ const setup = (chain: Chain, accounts: Map<string, Account>): {
   const contractEXD = accounts.get("deployer")!.address + '.executor-dao';
   const contractEDP000 = accounts.get("deployer")!.address + '.edp000-bootstrap';
   return {
-      administrator, deployer, contractEXD, contractEDP000 };
+      administrator, deployer, contractEXD, contractEDP000
+  };
 };
 
 Clarinet.test({

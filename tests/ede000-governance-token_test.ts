@@ -1,56 +1,70 @@
 
 import { Clarinet, Chain, Account } from "https://deno.land/x/clarinet@v0.28.1/index.ts";
-import { ExecutorDaoClient, ExecutorDaoErrCode } from "./src/executor-dao-client.ts";
-import { EDP000BootstrapClient, EDP000BootstrapErrCode } from "./src/edp000-bootstrap-client.ts";
+import { ExecutorDaoClient } from "./src/executor-dao-client.ts";
 import { EDE000GovernanceTokenClient, EDE000GovernanceTokenErrCode } from "./src/ede000-governance-token-client.ts";
-import { EDE001ProposalVotingClient, EDE001ProposalVotingErrCode } from "./src/ede001-proposal-voting-client.ts";
-import { EDE002ProposalSubmissionClient, EDE002ProposalSubmissionErrCode } from "./src/ede002-proposal-submission-client.ts";
+import { EDE001ProposalVotingClient } from "./src/ede001-proposal-voting-client.ts";
+import { EDE002ProposalSubmissionClient } from "./src/ede002-proposal-submission-client.ts";
+import { Utils } from "./src/utils.ts";
 
-const setup = (chain: Chain, accounts: Map<string, Account>): {
-  administrator: Account;
-  deployer: Account;
-  contractEXD: string;
-  contractEDP000: string;
-  contractEDP004: string;
-  contractEDP006: string;
-  contractEDE000: string;
-  contractEDE001: string;
-  contractEDE002: string;
-  phil: Account;
-  daisy: Account;
-  bobby: Account;
-  ward: Account;
-  exeDaoClient: ExecutorDaoClient;
-  edp000BootstrapClient: EDP000BootstrapClient;
-  ede000GovernanceTokenClient: EDE000GovernanceTokenClient;
-  ede001ProposalVotingClient: EDE001ProposalVotingClient;
-  ede002ProposalSubmissionClient: EDE002ProposalSubmissionClient;
-} => {
-  const administrator = accounts.get("deployer")!;
-  const deployer = accounts.get("deployer")!;
-  const contractEXD = accounts.get("deployer")!.address + '.executor-dao';
-  const contractEDP000 = accounts.get("deployer")!.address + '.edp000-bootstrap';
-  const contractEDP004 = accounts.get("deployer")!.address + '.edp004-dao-change-governance';
-  const contractEDP006 = accounts.get("deployer")!.address + '.edp006-dao-mint-burn-edg';
-  const contractEDE000 = accounts.get("deployer")!.address + '.ede000-governance-token';
-  const contractEDE001 = accounts.get("deployer")!.address + '.ede001-proposal-voting';
-  const contractEDE002 = accounts.get("deployer")!.address + '.ede002-proposal-submission';
-  const phil = accounts.get("wallet_1")!;
-  const daisy = accounts.get("wallet_2")!;
-  const bobby = accounts.get("wallet_3")!;
-  const ward = accounts.get("wallet_9")!;
-  const exeDaoClient = new ExecutorDaoClient(chain, deployer, 'executor-dao');
-  const edp000BootstrapClient = new EDP000BootstrapClient(chain, deployer, 'edp000-bootstrap');
-  const ede000GovernanceTokenClient = new EDE000GovernanceTokenClient(chain, deployer, 'ede000-governance-token');
-  const ede001ProposalVotingClient = new EDE001ProposalVotingClient(chain, deployer, 'ede001-proposal-voting');
-  const ede002ProposalSubmissionClient = new EDE002ProposalSubmissionClient(chain, deployer, 'ede002-proposal-submission');
-  return {
-      administrator, deployer, contractEXD,
-      contractEDP000, contractEDP004, contractEDP006,
-      contractEDE000, contractEDE001, contractEDE002, 
-      phil, daisy, bobby, ward, exeDaoClient, edp000BootstrapClient, 
-      ede000GovernanceTokenClient, ede001ProposalVotingClient, ede002ProposalSubmissionClient };
-};
+const utils = new Utils();
+
+const assertProposal = (
+  chain: Chain,
+  exeDaoClient: ExecutorDaoClient, 
+  contractEDP000: string, 
+  deployer: Account, 
+  phil: Account, 
+  bobby: Account, 
+  ward: Account, 
+  daisy: Account, 
+  contractEDE000: string, 
+  proposal: string, 
+  ede002ProposalSubmissionClient: EDE002ProposalSubmissionClient,
+  ede000GovernanceTokenClient: EDE000GovernanceTokenClient,
+  ede001ProposalVotingClient: EDE001ProposalVotingClient): any => {
+    let block = chain.mineBlock([
+      exeDaoClient.construct(contractEDP000, deployer.address),
+    ]);
+    block.receipts[0].result.expectOk().expectBool(true)
+
+    const propStartDelay = 144
+    const startHeight = block.height + propStartDelay
+    block = chain.mineBlock([
+      ede002ProposalSubmissionClient.propose(proposal, startHeight, contractEDE000, phil.address),
+    ]);
+    block.receipts[0].result.expectOk().expectBool(true)
+
+    chain.mineEmptyBlock(startHeight + 1);
+
+    block = chain.mineBlock([
+      ede001ProposalVotingClient.vote(500, true, proposal, contractEDE000, bobby.address)
+    ]);
+    block.receipts[0].result.expectOk().expectBool(true)
+    
+    chain.mineEmptyBlock(1585);
+  
+    ede000GovernanceTokenClient.edgGetBalance(deployer.address).result.expectOk().expectUint(1000)
+    ede000GovernanceTokenClient.edgGetBalance(phil.address).result.expectOk().expectUint(1000)
+    ede000GovernanceTokenClient.edgGetBalance(daisy.address).result.expectOk().expectUint(1000)
+    ede000GovernanceTokenClient.edgGetBalance(ward.address).result.expectOk().expectUint(0)
+
+    ede000GovernanceTokenClient.getTotalSupply().result.expectOk().expectUint(9000)
+
+    block = chain.mineBlock([
+      ede001ProposalVotingClient.conclude(proposal, ward.address)
+    ]);
+    block.receipts[0].result.expectOk().expectBool(true)
+
+    ede000GovernanceTokenClient.edgGetBalance(bobby.address).result.expectOk().expectUint(3000)
+    ede000GovernanceTokenClient.edgGetBalance(deployer.address).result.expectOk().expectUint(1000)
+    ede000GovernanceTokenClient.edgGetBalance(phil.address).result.expectOk().expectUint(1900)
+    ede000GovernanceTokenClient.edgGetLocked(phil.address).result.expectOk().expectUint(1485)
+    ede000GovernanceTokenClient.edgGetBalance(daisy.address).result.expectOk().expectUint(1010)
+    ede000GovernanceTokenClient.edgGetBalance(ward.address).result.expectOk().expectUint(490)
+    ede000GovernanceTokenClient.edgGetLocked(ward.address).result.expectOk().expectUint(490)
+
+    ede000GovernanceTokenClient.getTotalSupply().result.expectOk().expectUint(12400)
+}
 
 Clarinet.test({
     name: "Ensure edg cant be transferred if tx sender is not the owner or the dao.",
@@ -62,7 +76,7 @@ Clarinet.test({
         bobby,
         contractEDP000, 
         ede000GovernanceTokenClient
-      } = setup(chain, accounts)
+      } = utils.setup(chain, accounts)
   
       let block = chain.mineBlock([
         exeDaoClient.construct(contractEDP000, deployer.address),
@@ -88,7 +102,7 @@ Clarinet.test({
         bobby,
         contractEDP000, 
         ede000GovernanceTokenClient
-      } = setup(chain, accounts)
+      } = utils.setup(chain, accounts)
   
       let block = chain.mineBlock([
         exeDaoClient.construct(contractEDP000, deployer.address),
@@ -108,7 +122,7 @@ Clarinet.test({
 });
   
 Clarinet.test({
-    name: "Ensure owner cant directly mint, burn, unlock or lock edg tokens.",
+    name: "Ensure owner cant directly transfer edg tokens.",
     async fn(chain: Chain, accounts: Map<string, Account>) {
       const {
         deployer, 
@@ -117,7 +131,7 @@ Clarinet.test({
         bobby,
         contractEDP000, 
         ede000GovernanceTokenClient
-      } = setup(chain, accounts)
+      } = utils.setup(chain, accounts)
   
       let block = chain.mineBlock([
         exeDaoClient.construct(contractEDP000, deployer.address),
@@ -127,15 +141,9 @@ Clarinet.test({
       ede000GovernanceTokenClient.edgGetBalance(daisy.address).result.expectOk().expectUint(1000)
   
       block = chain.mineBlock([
-        ede000GovernanceTokenClient.edgLock(100, bobby.address, bobby.address),
-        ede000GovernanceTokenClient.edgUnlock(100, bobby.address, bobby.address),
-        ede000GovernanceTokenClient.edgMint(100, bobby.address, bobby.address),
-        ede000GovernanceTokenClient.edgBurn(100, bobby.address, bobby.address),
+        ede000GovernanceTokenClient.transfer(100, bobby.address, daisy.address, "for new batons", deployer.address),
       ]);
-      block.receipts[0].result.expectErr().expectUint(EDE000GovernanceTokenErrCode.err_unauthorised)
-      block.receipts[1].result.expectErr().expectUint(EDE000GovernanceTokenErrCode.err_unauthorised)
-      block.receipts[2].result.expectErr().expectUint(EDE000GovernanceTokenErrCode.err_unauthorised)
-      block.receipts[3].result.expectErr().expectUint(EDE000GovernanceTokenErrCode.err_unauthorised)
+      block.receipts[0].result.expectErr().expectUint(EDE000GovernanceTokenErrCode.err_not_token_owner)
       ede000GovernanceTokenClient.edgGetBalance(bobby.address).result.expectOk().expectUint(1000)
       ede000GovernanceTokenClient.edgGetBalance(daisy.address).result.expectOk().expectUint(1000)
       ede000GovernanceTokenClient.edgGetLocked(bobby.address).result.expectOk().expectUint(0)
@@ -144,41 +152,97 @@ Clarinet.test({
 });
   
 Clarinet.test({
-    name: "Ensure dao contract deployer cant directly mint, burn, unlock or lock edg tokens.",
-    async fn(chain: Chain, accounts: Map<string, Account>) {
-      const {
-        deployer, 
-        exeDaoClient,
-        daisy,
-        bobby,
-        contractEDP000, 
-        ede000GovernanceTokenClient
-      } = setup(chain, accounts)
-  
-      let block = chain.mineBlock([
-        exeDaoClient.construct(contractEDP000, deployer.address),
-      ]);
-      block.receipts[0].result.expectOk().expectBool(true)
-      ede000GovernanceTokenClient.edgGetBalance(bobby.address).result.expectOk().expectUint(1000)
-      ede000GovernanceTokenClient.edgGetBalance(daisy.address).result.expectOk().expectUint(1000)
-  
-      block = chain.mineBlock([
-        ede000GovernanceTokenClient.edgLock(100, bobby.address, deployer.address),
-        ede000GovernanceTokenClient.edgUnlock(100, bobby.address, deployer.address),
-        ede000GovernanceTokenClient.edgMint(100, bobby.address, deployer.address),
-        ede000GovernanceTokenClient.edgBurn(100, bobby.address, deployer.address),
-      ]);
-      block.receipts[0].result.expectErr().expectUint(EDE000GovernanceTokenErrCode.err_unauthorised)
-      block.receipts[1].result.expectErr().expectUint(EDE000GovernanceTokenErrCode.err_unauthorised)
-      block.receipts[2].result.expectErr().expectUint(EDE000GovernanceTokenErrCode.err_unauthorised)
-      block.receipts[3].result.expectErr().expectUint(EDE000GovernanceTokenErrCode.err_unauthorised)
-      ede000GovernanceTokenClient.edgGetBalance(bobby.address).result.expectOk().expectUint(1000)
-      ede000GovernanceTokenClient.edgGetBalance(daisy.address).result.expectOk().expectUint(1000)
-      ede000GovernanceTokenClient.edgGetLocked(bobby.address).result.expectOk().expectUint(0)
-      ede000GovernanceTokenClient.edgGetLocked(daisy.address).result.expectOk().expectUint(0)
-    }
+  name: "Ensure dao contract deployer cant directly mint edg tokens.",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    const {
+      deployer, 
+      exeDaoClient,
+      daisy,
+      bobby,
+      contractEDP000, 
+      ede000GovernanceTokenClient
+    } = utils.setup(chain, accounts)
+
+    let block = chain.mineBlock([
+      exeDaoClient.construct(contractEDP000, deployer.address),
+    ]);
+    block.receipts[0].result.expectOk().expectBool(true)
+    ede000GovernanceTokenClient.edgGetBalance(bobby.address).result.expectOk().expectUint(1000)
+    ede000GovernanceTokenClient.edgGetBalance(daisy.address).result.expectOk().expectUint(1000)
+
+    block = chain.mineBlock([
+      ede000GovernanceTokenClient.edgMint(100, bobby.address, deployer.address),
+    ]);
+    block.receipts[0].result.expectErr().expectUint(EDE000GovernanceTokenErrCode.err_unauthorised)
+    ede000GovernanceTokenClient.edgGetBalance(bobby.address).result.expectOk().expectUint(1000)
+    ede000GovernanceTokenClient.edgGetBalance(daisy.address).result.expectOk().expectUint(1000)
+    ede000GovernanceTokenClient.edgGetLocked(bobby.address).result.expectOk().expectUint(0)
+    ede000GovernanceTokenClient.edgGetLocked(daisy.address).result.expectOk().expectUint(0)
+  }
 });
-  
+
+Clarinet.test({
+  name: "Ensure dao contract deployer cant directly burn edg tokens.",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    const {
+      deployer, 
+      exeDaoClient,
+      daisy,
+      bobby,
+      contractEDP000, 
+      ede000GovernanceTokenClient
+    } = utils.setup(chain, accounts)
+
+    let block = chain.mineBlock([
+      exeDaoClient.construct(contractEDP000, deployer.address),
+    ]);
+    block.receipts[0].result.expectOk().expectBool(true)
+    ede000GovernanceTokenClient.edgGetBalance(bobby.address).result.expectOk().expectUint(1000)
+    ede000GovernanceTokenClient.edgGetBalance(daisy.address).result.expectOk().expectUint(1000)
+
+    block = chain.mineBlock([
+      ede000GovernanceTokenClient.edgBurn(100, bobby.address, deployer.address)
+    ]);
+    block.receipts[0].result.expectErr().expectUint(EDE000GovernanceTokenErrCode.err_unauthorised)
+    ede000GovernanceTokenClient.edgGetBalance(bobby.address).result.expectOk().expectUint(1000)
+    ede000GovernanceTokenClient.edgGetBalance(daisy.address).result.expectOk().expectUint(1000)
+    ede000GovernanceTokenClient.edgGetLocked(bobby.address).result.expectOk().expectUint(0)
+    ede000GovernanceTokenClient.edgGetLocked(daisy.address).result.expectOk().expectUint(0)
+  }
+});
+
+Clarinet.test({
+  name: "Ensure dao contract deployer cant directly lock/unlock edg tokens.",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    const {
+      deployer, 
+      exeDaoClient,
+      daisy,
+      bobby,
+      contractEDP000, 
+      ede000GovernanceTokenClient
+    } = utils.setup(chain, accounts)
+
+    let block = chain.mineBlock([
+      exeDaoClient.construct(contractEDP000, deployer.address),
+    ]);
+    block.receipts[0].result.expectOk().expectBool(true)
+    ede000GovernanceTokenClient.edgGetBalance(bobby.address).result.expectOk().expectUint(1000)
+    ede000GovernanceTokenClient.edgGetBalance(daisy.address).result.expectOk().expectUint(1000)
+
+    block = chain.mineBlock([
+      ede000GovernanceTokenClient.edgLock(100, bobby.address, deployer.address),
+      ede000GovernanceTokenClient.edgUnlock(100, bobby.address, deployer.address),
+    ]);
+    block.receipts[0].result.expectErr().expectUint(EDE000GovernanceTokenErrCode.err_unauthorised)
+    block.receipts[1].result.expectErr().expectUint(EDE000GovernanceTokenErrCode.err_unauthorised)
+    ede000GovernanceTokenClient.edgGetBalance(bobby.address).result.expectOk().expectUint(1000)
+    ede000GovernanceTokenClient.edgGetBalance(daisy.address).result.expectOk().expectUint(1000)
+    ede000GovernanceTokenClient.edgGetLocked(bobby.address).result.expectOk().expectUint(0)
+    ede000GovernanceTokenClient.edgGetLocked(daisy.address).result.expectOk().expectUint(0)
+  }
+});
+
 Clarinet.test({
     name: "Ensure dao contract deployer cant directly change the sip 010 settings on the governance contract.",
     async fn(chain: Chain, accounts: Map<string, Account>) {
@@ -187,7 +251,7 @@ Clarinet.test({
         exeDaoClient,
         contractEDP000, 
         ede000GovernanceTokenClient
-      } = setup(chain, accounts)
+      } = utils.setup(chain, accounts)
   
       let block = chain.mineBlock([
         exeDaoClient.construct(contractEDP000, deployer.address),
@@ -220,7 +284,7 @@ Clarinet.test({
         ede001ProposalVotingClient,
         ede002ProposalSubmissionClient,
         ede000GovernanceTokenClient
-      } = setup(chain, accounts)
+      } = utils.setup(chain, accounts)
   
       let block = chain.mineBlock([
         exeDaoClient.construct(contractEDP000, deployer.address),
@@ -261,61 +325,66 @@ Clarinet.test({
   });
   
   Clarinet.test({
-    name: "Ensure edg tokens can be minted, burned, locked, unlocked and transferred via a proposal.",
+    name: "Ensure edg tokens can be minted via a proposal.",
     async fn(chain: Chain, accounts: Map<string, Account>) {
-      const {
-        deployer, 
-        exeDaoClient,
-        phil, daisy, bobby, ward,
-        contractEDP000, 
-        contractEDP006,
-        contractEDE000,
-        ede001ProposalVotingClient,
-        ede002ProposalSubmissionClient,
-        ede000GovernanceTokenClient
-      } = setup(chain, accounts)
-  
-      let block = chain.mineBlock([
-        exeDaoClient.construct(contractEDP000, deployer.address),
-      ]);
-      block.receipts[0].result.expectOk().expectBool(true)
-
-      const propStartDelay = 144
-      const startHeight = block.height + propStartDelay
-      block = chain.mineBlock([
-        ede002ProposalSubmissionClient.propose(contractEDP006, startHeight, contractEDE000, phil.address),
-      ]);
-      block.receipts[0].result.expectOk().expectBool(true)
-  
-      chain.mineEmptyBlock(startHeight + 1);
-  
-      block = chain.mineBlock([
-        ede001ProposalVotingClient.vote(500, true, contractEDP006, contractEDE000, bobby.address)
-      ]);
-      block.receipts[0].result.expectOk().expectBool(true)
-      
-      chain.mineEmptyBlock(1585);
-    
-      ede000GovernanceTokenClient.edgGetBalance(deployer.address).result.expectOk().expectUint(1000)
-      ede000GovernanceTokenClient.edgGetBalance(phil.address).result.expectOk().expectUint(1000)
-      ede000GovernanceTokenClient.edgGetBalance(daisy.address).result.expectOk().expectUint(1000)
-      ede000GovernanceTokenClient.edgGetBalance(ward.address).result.expectOk().expectUint(0)
-
-      ede000GovernanceTokenClient.getTotalSupply().result.expectOk().expectUint(9000)
-  
-      block = chain.mineBlock([
-        ede001ProposalVotingClient.conclude(contractEDP006, ward.address)
-      ]);
-      block.receipts[0].result.expectOk().expectBool(true)
-  
+      const { contractEDP006, bobby, deployer, phil, daisy, ward, ede000GovernanceTokenClient } = utils.setup(chain, accounts)
+      utils.passProposal(true, utils, chain, accounts, contractEDP006)
+      ede000GovernanceTokenClient.edgGetBalance(bobby.address).result.expectOk().expectUint(3000)
       ede000GovernanceTokenClient.edgGetBalance(deployer.address).result.expectOk().expectUint(1000)
       ede000GovernanceTokenClient.edgGetBalance(phil.address).result.expectOk().expectUint(1900)
       ede000GovernanceTokenClient.edgGetLocked(phil.address).result.expectOk().expectUint(1485)
       ede000GovernanceTokenClient.edgGetBalance(daisy.address).result.expectOk().expectUint(1010)
       ede000GovernanceTokenClient.edgGetBalance(ward.address).result.expectOk().expectUint(490)
       ede000GovernanceTokenClient.edgGetLocked(ward.address).result.expectOk().expectUint(490)
+      ede000GovernanceTokenClient.getTotalSupply().result.expectOk().expectUint(12400)
+    }
+  });
 
-      ede000GovernanceTokenClient.getTotalSupply().result.expectOk().expectUint(10400)
+  Clarinet.test({
+    name: "Ensure edg tokens can be burned via a proposal.",
+    async fn(chain: Chain, accounts: Map<string, Account>) {
+      const { contractEDP006, bobby, deployer, phil, daisy, ward, ede000GovernanceTokenClient } = utils.setup(chain, accounts)
+      utils.passProposal(true, utils, chain, accounts, contractEDP006)
+      ede000GovernanceTokenClient.edgGetBalance(bobby.address).result.expectOk().expectUint(3000)
+      ede000GovernanceTokenClient.edgGetBalance(deployer.address).result.expectOk().expectUint(1000)
+      ede000GovernanceTokenClient.edgGetBalance(phil.address).result.expectOk().expectUint(1900)
+      ede000GovernanceTokenClient.edgGetLocked(phil.address).result.expectOk().expectUint(1485)
+      ede000GovernanceTokenClient.edgGetBalance(daisy.address).result.expectOk().expectUint(1010)
+      ede000GovernanceTokenClient.edgGetBalance(ward.address).result.expectOk().expectUint(490)
+      ede000GovernanceTokenClient.edgGetLocked(ward.address).result.expectOk().expectUint(490)
+      ede000GovernanceTokenClient.getTotalSupply().result.expectOk().expectUint(12400)
+    }
+  });
+
+  Clarinet.test({
+    name: "Ensure edg tokens can be transferred via a proposal.",
+    async fn(chain: Chain, accounts: Map<string, Account>) {
+      const { contractEDP006, bobby, deployer, phil, daisy, ward, ede000GovernanceTokenClient } = utils.setup(chain, accounts)
+      utils.passProposal(true, utils, chain, accounts, contractEDP006)
+      ede000GovernanceTokenClient.edgGetBalance(bobby.address).result.expectOk().expectUint(3000)
+      ede000GovernanceTokenClient.edgGetBalance(deployer.address).result.expectOk().expectUint(1000)
+      ede000GovernanceTokenClient.edgGetBalance(phil.address).result.expectOk().expectUint(1900)
+      ede000GovernanceTokenClient.edgGetLocked(phil.address).result.expectOk().expectUint(1485)
+      ede000GovernanceTokenClient.edgGetBalance(daisy.address).result.expectOk().expectUint(1010)
+      ede000GovernanceTokenClient.edgGetBalance(ward.address).result.expectOk().expectUint(490)
+      ede000GovernanceTokenClient.edgGetLocked(ward.address).result.expectOk().expectUint(490)
+      ede000GovernanceTokenClient.getTotalSupply().result.expectOk().expectUint(12400)
+    }
+  });
+
+  Clarinet.test({
+    name: "Ensure edg tokens can be locked via a proposal.",
+    async fn(chain: Chain, accounts: Map<string, Account>) {
+      const { contractEDP006, bobby, deployer, phil, daisy, ward, ede000GovernanceTokenClient } = utils.setup(chain, accounts)
+      utils.passProposal(true, utils, chain, accounts, contractEDP006)
+      ede000GovernanceTokenClient.edgGetBalance(bobby.address).result.expectOk().expectUint(3000)
+      ede000GovernanceTokenClient.edgGetBalance(deployer.address).result.expectOk().expectUint(1000)
+      ede000GovernanceTokenClient.edgGetBalance(phil.address).result.expectOk().expectUint(1900)
+      ede000GovernanceTokenClient.edgGetLocked(phil.address).result.expectOk().expectUint(1485)
+      ede000GovernanceTokenClient.edgGetBalance(daisy.address).result.expectOk().expectUint(1010)
+      ede000GovernanceTokenClient.edgGetBalance(ward.address).result.expectOk().expectUint(490)
+      ede000GovernanceTokenClient.edgGetLocked(ward.address).result.expectOk().expectUint(490)
+      ede000GovernanceTokenClient.getTotalSupply().result.expectOk().expectUint(12400)
     }
   });
   

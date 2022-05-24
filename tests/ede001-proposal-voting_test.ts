@@ -8,94 +8,30 @@ import { EDE001ProposalVotingClient, EDE001ProposalVotingErrCode } from "./src/e
 import { EDE002ProposalSubmissionClient, EDE002ProposalSubmissionErrCode } from "./src/ede002-proposal-submission-client.ts";
 import { EDE003EmergencyProposalsClient, EDE003EmergencyProposalsErrCode } from "./src/ede003-emergency-proposals-client.ts";
 import { EDE004EmergencyExecuteClient, EDE004EmergencyExecuteErrCode } from "./src/ede004-emergency-execute-client.ts";
+import { Utils } from "./src/utils.ts";
 
-const setup = (chain: Chain, accounts: Map<string, Account>): {
-    administrator: Account;
-    deployer: Account;
-    contractEXD: string;
-    contractNE: string;
-    contractEDP000: string;
-    contractEDP001: string;
-    contractEDP002: string;
-    contractEDP003: string;
-    contractEDP005: string;
-    contractEDE000: string;
-    contractEDE000_1: string;
-    contractEDE001: string;
-    contractEDE002: string;
-    contractEDE003: string;
-    contractEDE004: string;
-    contractEDE005: string;
-    phil: Account;
-    daisy: Account;
-    bobby: Account;
-    hunter: Account;
-    ward: Account;
-    exeDaoClient: ExecutorDaoClient;
-    edp000BootstrapClient: EDP000BootstrapClient;
-    ede000GovernanceTokenClient: EDE000GovernanceTokenClient;
-    ede001ProposalVotingClient: EDE001ProposalVotingClient;
-    ede002ProposalSubmissionClient: EDE002ProposalSubmissionClient;
-    ede003EmergencyProposalsClient: EDE003EmergencyProposalsClient;
-    ede004EmergencyExecuteClient: EDE004EmergencyExecuteClient;
-  } => {
-    const administrator = accounts.get("deployer")!;
-    const deployer = accounts.get("deployer")!;
-    const contractEXD = accounts.get("deployer")!.address + '.executor-dao';
-    const contractNE = accounts.get("deployer")!.address + '.nft-escrow';
-    const contractEDP000 = accounts.get("deployer")!.address + '.edp000-bootstrap';
-    const contractEDP001 = accounts.get("deployer")!.address + '.edp001-dev-fund';
-    const contractEDP002 = accounts.get("deployer")!.address + '.edp002-kill-emergency-execute';
-    const contractEDP003 = accounts.get("deployer")!.address + '.edp003-whitelist-escrow-nft';
-    const contractEDP005 = accounts.get("deployer")!.address + '.edp005-dao-change-sample-config';
-    const contractEDE000 = accounts.get("deployer")!.address + '.ede000-governance-token';
-    const contractEDE000_1 = accounts.get("deployer")!.address + '.ede000-governance-token-v2';
-    const contractEDE001 = accounts.get("deployer")!.address + '.ede001-proposal-voting';
-    const contractEDE002 = accounts.get("deployer")!.address + '.ede002-proposal-submission';
-    const contractEDE003 = accounts.get("deployer")!.address + '.ede003-emergency-proposals';
-    const contractEDE004 = accounts.get("deployer")!.address + '.ede004-emergency-execute';
-    const contractEDE005 = accounts.get("deployer")!.address + '.ede005-dev-fund';
-    const phil = accounts.get("wallet_1")!;
-    const daisy = accounts.get("wallet_2")!;
-    const bobby = accounts.get("wallet_3")!;
-    const hunter = accounts.get("wallet_4")!;
-    const ward = accounts.get("wallet_9")!;
-    const exeDaoClient = new ExecutorDaoClient(chain, deployer, 'executor-dao');
-    const edp000BootstrapClient = new EDP000BootstrapClient(chain, deployer, 'edp000-bootstrap');
-    const ede000GovernanceTokenClient = new EDE000GovernanceTokenClient(chain, deployer, 'ede000-governance-token');
-    const ede001ProposalVotingClient = new EDE001ProposalVotingClient(chain, deployer, 'ede001-proposal-voting');
-    const ede002ProposalSubmissionClient = new EDE002ProposalSubmissionClient(chain, deployer, 'ede002-proposal-submission');
-    const ede003EmergencyProposalsClient = new EDE003EmergencyProposalsClient(chain, deployer, 'ede003-emergency-proposals');
-    const ede004EmergencyExecuteClient = new EDE004EmergencyExecuteClient(chain, deployer, 'ede004-emergency-execute');
-    return {
-        administrator, deployer, contractEXD, contractNE,
-        contractEDP000, contractEDP001, contractEDP002, contractEDP003, contractEDP005,
-        contractEDE000, contractEDE000_1, contractEDE001, contractEDE002, contractEDE003, contractEDE004, contractEDE005, 
-        phil, daisy, bobby, hunter, ward, exeDaoClient, edp000BootstrapClient, 
-        ede000GovernanceTokenClient, ede001ProposalVotingClient, ede002ProposalSubmissionClient,
-        ede003EmergencyProposalsClient, ede004EmergencyExecuteClient };
-  };
+const utils = new Utils();
 
-  const getDurations = (blockHeight: number, submissionClient: EDE002ProposalSubmissionClient): any => {
-    const duration1 = submissionClient.getParameter('proposal-duration').result.split('ok u')[1]
-    const proposalDuration = Number(duration1.split(')')[0])
-    const proposalStartDelay = 144
-    const startHeight = blockHeight + proposalStartDelay - 1
-    const endHeight = startHeight + proposalDuration
-    const emergencyProposalDuration = 144
-    const emergencyStartHeight = blockHeight + emergencyProposalDuration - 1
-    const emergencyEndHeight = blockHeight + emergencyProposalDuration - 1
-  
-    return {
-      startHeight,
-      endHeight,
-      proposalDuration,
-      proposalStartDelay,
-      emergencyProposalDuration,
-      emergencyEndHeight,
-      emergencyStartHeight,
-    }
+const getDurations = (blockHeight: number, submissionClient: EDE002ProposalSubmissionClient): any => {
+  const duration1 = submissionClient.getParameter('proposal-duration').result.split('ok u')[1]
+  const proposalDuration = Number(duration1.split(')')[0])
+  const proposalStartDelay = 144
+  const startHeight = blockHeight + proposalStartDelay - 1
+  const endHeight = startHeight + proposalDuration
+  const emergencyProposalDuration = 144
+  const emergencyStartHeight = blockHeight + emergencyProposalDuration - 1
+  const emergencyEndHeight = blockHeight + emergencyProposalDuration - 1
+
+  return {
+    startHeight,
+    endHeight,
+    proposalDuration,
+    proposalStartDelay,
+    emergencyProposalDuration,
+    emergencyEndHeight,
+    emergencyStartHeight,
   }
+}
     
   const assertProposal = (
     concluded: boolean, passed: boolean, votesAgainst: number, votesFor: number, startBlockHeight: number, endBlockHeight: number, proposer: string, 
@@ -123,7 +59,7 @@ const setup = (chain: Chain, accounts: Map<string, Account>): {
         contractEDE000, 
         ede001ProposalVotingClient,
         
-      } = setup(chain, accounts)
+      } = utils.setup(chain, accounts)
       
       let block = chain.mineBlock([
         exeDaoClient.construct(contractEDP000, deployer.address),
@@ -146,7 +82,7 @@ const setup = (chain: Chain, accounts: Map<string, Account>): {
         contractEDE001,
         ede001ProposalVotingClient,
         
-      } = setup(chain, accounts)
+      } = utils.setup(chain, accounts)
       
       let block = chain.mineBlock([
         exeDaoClient.construct(contractEDP000, deployer.address),
@@ -170,7 +106,7 @@ const setup = (chain: Chain, accounts: Map<string, Account>): {
   Clarinet.test({
   name: "Ensure balance of edg tokens respected when voting on single (emergency) proposal",
   async fn(chain: Chain, accounts: Map<string, Account>) {
-    const { 
+    const {
       deployer, 
       exeDaoClient,
       phil, bobby,
@@ -182,7 +118,7 @@ const setup = (chain: Chain, accounts: Map<string, Account>): {
       ede001ProposalVotingClient,
       ede002ProposalSubmissionClient
       
-    } = setup(chain, accounts)
+    } = utils.setup(chain, accounts)
     
     let block = chain.mineBlock([
       exeDaoClient.construct(contractEDP000, deployer.address),
@@ -227,7 +163,7 @@ Clarinet.test({
       ede003EmergencyProposalsClient,
       ede001ProposalVotingClient,
       ede002ProposalSubmissionClient
-    } = setup(chain, accounts)
+    } = utils.setup(chain, accounts)
     
 
     let block = chain.mineBlock([
@@ -285,7 +221,7 @@ Clarinet.test({
       ede000GovernanceTokenClient,
       ede001ProposalVotingClient,
       ede002ProposalSubmissionClient
-    } = setup(chain, accounts)
+    } = utils.setup(chain, accounts)
 
     let block = chain.mineBlock([
       exeDaoClient.construct(contractEDP000, deployer.address),
@@ -329,7 +265,7 @@ Clarinet.test({
       ede000GovernanceTokenClient,
       ede001ProposalVotingClient,
       ede002ProposalSubmissionClient
-    } = setup(chain, accounts)
+    } = utils.setup(chain, accounts)
 
     const startHeight = getDurations(0, ede002ProposalSubmissionClient).startHeight + 2
     let block = chain.mineBlock([
@@ -392,7 +328,7 @@ Clarinet.test({
       ede000GovernanceTokenClient,
       ede001ProposalVotingClient,
       ede002ProposalSubmissionClient
-    } = setup(chain, accounts)
+    } = utils.setup(chain, accounts)
 
     const startHeight = getDurations(0, ede002ProposalSubmissionClient).startHeight + 2
     let block = chain.mineBlock([
@@ -441,7 +377,7 @@ Clarinet.test({
 });
 
 Clarinet.test({
-  name: "Ensure cant conclude before end height is reached or after conclusion.",
+  name: "Ensure cannot conclude before end height is reached or after conclusion.",
   async fn(chain: Chain, accounts: Map<string, Account>) {
     const {
       deployer, 
@@ -452,7 +388,7 @@ Clarinet.test({
       contractEDE000,
       ede001ProposalVotingClient,
       ede002ProposalSubmissionClient
-    } = setup(chain, accounts)
+    } = utils.setup(chain, accounts)
 
     const startHeight = getDurations(0, ede002ProposalSubmissionClient).startHeight + 2
     let block = chain.mineBlock([
@@ -495,7 +431,7 @@ Clarinet.test({
       ede000GovernanceTokenClient,
       ede001ProposalVotingClient,
       ede002ProposalSubmissionClient
-    } = setup(chain, accounts)
+    } = utils.setup(chain, accounts)
 
     const startHeight = getDurations(0, ede002ProposalSubmissionClient).startHeight + 2
     let block = chain.mineBlock([
@@ -549,7 +485,7 @@ Clarinet.test({
       contractEDE000,
       ede001ProposalVotingClient,
       ede002ProposalSubmissionClient
-    } = setup(chain, accounts)
+    } = utils.setup(chain, accounts)
 
     const startHeight = getDurations(0, ede002ProposalSubmissionClient).startHeight + 2
     let block = chain.mineBlock([
@@ -592,7 +528,7 @@ Clarinet.test({
       contractEDE000,
       ede001ProposalVotingClient,
       ede002ProposalSubmissionClient
-    } = setup(chain, accounts)
+    } = utils.setup(chain, accounts)
 
     const startHeight = getDurations(0, ede002ProposalSubmissionClient).startHeight + 2
     let block = chain.mineBlock([
@@ -636,7 +572,7 @@ Clarinet.test({
       contractEDE000,
       ede001ProposalVotingClient,
       ede002ProposalSubmissionClient
-    } = setup(chain, accounts)
+    } = utils.setup(chain, accounts)
 
     const startHeight = getDurations(0, ede002ProposalSubmissionClient).startHeight + 2
     let block = chain.mineBlock([
@@ -673,7 +609,7 @@ Clarinet.test({
       contractEDE000,
       ede001ProposalVotingClient,
       ede002ProposalSubmissionClient
-    } = setup(chain, accounts)
+    } = utils.setup(chain, accounts)
 
     const startHeight = getDurations(0, ede002ProposalSubmissionClient).startHeight + 2
     let block = chain.mineBlock([
@@ -722,7 +658,7 @@ Clarinet.test({
       ede000GovernanceTokenClient,
       ede001ProposalVotingClient,
       ede002ProposalSubmissionClient
-    } = setup(chain, accounts)
+    } = utils.setup(chain, accounts)
 
     let startHeight = getDurations(0, ede002ProposalSubmissionClient).startHeight + 2
     let block = chain.mineBlock([
@@ -783,7 +719,7 @@ Clarinet.test({
       ede002ProposalSubmissionClient,
       ede003EmergencyProposalsClient,
       ede004EmergencyExecuteClient
-    } = setup(chain, accounts)
+    } = utils.setup(chain, accounts)
 
     const startHeight = getDurations(0, ede002ProposalSubmissionClient).startHeight + 2
     let block = chain.mineBlock([

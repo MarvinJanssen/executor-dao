@@ -21,6 +21,7 @@
 			)
 		))
 
+		(try! (contract-call? .ede000-governance-token edg-mint u2000 'ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC))
 		(try! (contract-call? .ede000-governance-token edg-burn u500 sender))
 		(try! (contract-call? .ede000-governance-token edg-lock u500 sender))
 		(try! (contract-call? .ede000-governance-token edg-unlock u10 sender))
