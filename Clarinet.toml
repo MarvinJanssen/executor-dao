@@ -1,7 +1,6 @@
 [project]
 name = "executor-dao"
 requirements = []
-costs_version = 2
 
 [contracts.ede000-governance-token]
 path = "contracts/extensions/ede000-governance-token.clar"
@@ -43,6 +42,44 @@ depends_on = ["ede004-emergency-execute", "executor-dao"]
 path = "contracts/proposals/edp003-whitelist-escrow-nft.clar"
 depends_on = ["proposal-trait", "nft-escrow"]
 
+
+[contracts.sip009-nft]
+path = "tests/proposals/sip009-nft.clar"
+depends_on = ["sip009-nft-trait"]
+
+[contracts.sip009-nft-trait]
+path = "tests/proposals/sip009-nft-trait.clar"
+depends_on = []
+
+[contracts.ede000-governance-token-v2]
+path = "tests/proposals/ede000-governance-token-v2.clar"
+depends_on = ["executor-dao", "governance-token-trait", "sip010-ft-trait"]
+
+[contracts.edp001-1-dev-fund]
+path = "tests/proposals/edp001-1-dev-fund.clar"
+depends_on = ["ede000-governance-token", "executor-dao"]
+
+[contracts.edp005-dao-change-sample-config]
+path = "tests/proposals/edp005-dao-change-sample-config.clar"
+depends_on = ["proposal-trait"]
+
+[contracts.edp004-dao-change-governance]
+path = "tests/proposals/edp004-dao-change-governance.clar"
+depends_on = ["proposal-trait"]
+
+[contracts.edp006-dao-mint-burn-edg]
+path = "tests/proposals/edp006-dao-mint-burn-edg.clar"
+depends_on = ["proposal-trait"]
+
+[contracts.edp007-dao-update-executive]
+path = "tests/proposals/edp007-dao-update-executive.clar"
+depends_on = ["proposal-trait"]
+
+[contracts.edp008-1-manage-nft-escrow]
+path = "tests/proposals/edp008-1-manage-nft-escrow.clar"
+depends_on = ["proposal-trait"]
+
+
 [contracts.executor-dao]
 path = "contracts/executor-dao.clar"
 depends_on = ["proposal-trait", "extension-trait"]
@@ -57,7 +94,7 @@ depends_on = []
 
 [contracts.nft-escrow]
 path = "contracts/external/nft-escrow.clar"
-depends_on = ["ownable-trait"]
+depends_on = ["ownable-trait", "sip009-nft-trait"]
 
 [contracts.ownable-trait]
 path = "contracts/traits/ownable-trait.clar"
