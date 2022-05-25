@@ -5,7 +5,6 @@ import {
   types,
   ReadOnlyFn,
 } from "https://deno.land/x/clarinet@v0.28.1/index.ts";
-import { assertEquals, assert } from "https://deno.land/std@0.90.0/testing/asserts.ts";
 
 
 export enum EDE001ProposalVotingErrCode {
@@ -23,7 +22,7 @@ export enum EDE001ProposalVotingErrCode {
   }
 
 export class EDE001ProposalVotingClient {
-  contractName: string = "";
+  contractName = "";
   chain: Chain;
   deployer: Account;
 

@@ -1,11 +1,7 @@
 import {
-  Tx,
   Chain,
-  Account,
-  types,
-  ReadOnlyFn,
+  Account
 } from "https://deno.land/x/clarinet@v0.28.1/index.ts";
-import { assertEquals, assert } from "https://deno.land/std@0.90.0/testing/asserts.ts";
 import { ExecutorDaoClient } from "./executor-dao-client.ts";
 import { EDP000BootstrapClient } from "./edp000-bootstrap-client.ts";
 import { EDE000GovernanceTokenClient } from "./ede000-governance-token-client.ts";
@@ -14,11 +10,20 @@ import { EDE002ProposalSubmissionClient } from "./ede002-proposal-submission-cli
 import { EDE003EmergencyProposalsClient } from "./ede003-emergency-proposals-client.ts";
 import { EDE004EmergencyExecuteClient } from "./ede004-emergency-execute-client.ts";
 import { EDE005DevFundClient } from "./ede005-dev-fund-client.ts";
+import { NftEscrowClient } from "./nft-escrow-client.ts";
+import { NftClient } from "./nft-client.ts";
 
 export class Utils {
   constructor() {}
+  // deno-lint-ignore no-explicit-any
+  constructDao = (chain: Chain, contractEDP000: string, deployer: Account, exeDaoClient: ExecutorDaoClient): any => {
+    const block = chain.mineBlock([
+      exeDaoClient.construct(contractEDP000, deployer.address),
+    ]);
+    block.receipts[0].result.expectOk().expectBool(true)
+}
 
-  passProposal = (firstRun: boolean, utils: Utils, chain: Chain, accounts: Map<string, Account>, proposal: string): any => {
+  passProposal = (blockHeight: number, chain: Chain, accounts: Map<string, Account>, proposal: string): any => {
     const {
         deployer, 
         exeDaoClient,
@@ -32,7 +37,7 @@ export class Utils {
       let block = chain.mineBlock([
         exeDaoClient.construct(contractEDP000, deployer.address),
       ]);
-      if (firstRun) block.receipts[0].result.expectOk().expectBool(true)
+      if (blockHeight === 0) block.receipts[0].result.expectOk().expectBool(true)
   
       const propStartDelay = 144
       let startHeight = 1
@@ -42,7 +47,7 @@ export class Utils {
       ]);
       block.receipts[0].result.expectOk().expectBool(true)
   
-      if (firstRun) chain.mineEmptyBlock(startHeight + 1);
+      if (blockHeight === 0) chain.mineEmptyBlock(startHeight + 1);
       else chain.mineEmptyBlock(144);
       // console.log('Block Height: ' + block.height + ' Start Height: ' + startHeight)
       
@@ -68,7 +73,6 @@ export class Utils {
     hunter: Account;
     ward: Account;
     contractEXD: string;
-    contractNftEscrow: string;
     contractEDP000: string;
     contractEDP001: string;
     contractEDP001_1: string;
@@ -78,6 +82,7 @@ export class Utils {
     contractEDP005: string;
     contractEDP006: string;
     contractEDP007: string;
+    contractEDP008_1: string;
     contractEDE000: string;
     contractEDE000_1: string;
     contractEDE001: string;
@@ -85,6 +90,8 @@ export class Utils {
     contractEDE003: string;
     contractEDE004: string;
     contractEDE005: string;
+    contractNftEscrow: string;
+    contractNft: string;
     exeDaoClient: ExecutorDaoClient;
     edp000BootstrapClient: EDP000BootstrapClient;
     ede000GovernanceTokenClient: EDE000GovernanceTokenClient;
@@ -93,11 +100,12 @@ export class Utils {
     ede003EmergencyProposalsClient: EDE003EmergencyProposalsClient;
     ede004EmergencyExecuteClient: EDE004EmergencyExecuteClient;
     ede005DevFundClient: EDE005DevFundClient;
+    nftEscrowClient: NftEscrowClient;
+    nftClient: NftClient;
   } => {
     const administrator = accounts.get("deployer")!;
     const deployer = accounts.get("deployer")!;
     const contractEXD = accounts.get("deployer")!.address + '.executor-dao';
-    const contractNftEscrow = accounts.get("deployer")!.address + '.nft-escrow';
     const contractEDP000 = accounts.get("deployer")!.address + '.edp000-bootstrap';
     const contractEDP001 = accounts.get("deployer")!.address + '.edp001-dev-fund';
     const contractEDP001_1 = accounts.get("deployer")!.address + '.edp001-1-dev-fund';
@@ -107,6 +115,7 @@ export class Utils {
     const contractEDP005 = accounts.get("deployer")!.address + '.edp005-dao-change-sample-config';
     const contractEDP006 = accounts.get("deployer")!.address + '.edp006-dao-mint-burn-edg';
     const contractEDP007 = accounts.get("deployer")!.address + '.edp007-dao-update-executive';
+    const contractEDP008_1 = accounts.get("deployer")!.address + '.edp008-1-manage-nft-escrow';
     const contractEDE000 = accounts.get("deployer")!.address + '.ede000-governance-token';
     const contractEDE000_1 = accounts.get("deployer")!.address + '.ede000-governance-token-v2';
     const contractEDE001 = accounts.get("deployer")!.address + '.ede001-proposal-voting';
@@ -114,6 +123,8 @@ export class Utils {
     const contractEDE003 = accounts.get("deployer")!.address + '.ede003-emergency-proposals';
     const contractEDE004 = accounts.get("deployer")!.address + '.ede004-emergency-execute';
     const contractEDE005 = accounts.get("deployer")!.address + '.ede005-dev-fund';
+    const contractNftEscrow = accounts.get("deployer")!.address + '.nft-escrow';
+    const contractNft = accounts.get("deployer")!.address + '.sip009-nft';
     const phil = accounts.get("wallet_1")!;
     const daisy = accounts.get("wallet_2")!;
     const bobby = accounts.get("wallet_3")!;
@@ -127,6 +138,8 @@ export class Utils {
     const ede003EmergencyProposalsClient = new EDE003EmergencyProposalsClient(chain, deployer, 'ede003-emergency-proposals');
     const ede004EmergencyExecuteClient = new EDE004EmergencyExecuteClient(chain, deployer, 'ede004-emergency-execute');
     const ede005DevFundClient = new EDE005DevFundClient(chain, deployer, 'ede005-dev-fund');
+    const nftEscrowClient = new NftEscrowClient(chain, deployer, 'nft-escrow');
+    const nftClient = new NftClient(chain, deployer, 'sip009-nft');
     return {
         administrator, 
         deployer, 
@@ -136,7 +149,6 @@ export class Utils {
         hunter, 
         ward, 
         contractEXD, 
-        contractNftEscrow, 
         contractEDP000, 
         contractEDP001, 
         contractEDP001_1, 
@@ -146,6 +158,7 @@ export class Utils {
         contractEDP005, 
         contractEDP006,
         contractEDP007,
+        contractEDP008_1,
         contractEDE000, 
         contractEDE000_1, 
         contractEDE001, 
@@ -153,6 +166,8 @@ export class Utils {
         contractEDE003, 
         contractEDE004, 
         contractEDE005, 
+        contractNftEscrow, 
+        contractNft, 
         exeDaoClient, 
         edp000BootstrapClient,
         ede000GovernanceTokenClient, 
@@ -160,7 +175,10 @@ export class Utils {
         ede002ProposalSubmissionClient, 
         ede003EmergencyProposalsClient,
         ede004EmergencyExecuteClient,
-        ede005DevFundClient 
+        ede005DevFundClient,
+        nftEscrowClient,
+        nftClient 
       };
   };
 }
+const utils = new Utils();

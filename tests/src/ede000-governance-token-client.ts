@@ -5,7 +5,6 @@ import {
   types,
   ReadOnlyFn,
 } from "https://deno.land/x/clarinet@v0.28.1/index.ts";
-import { assertEquals, assert } from "https://deno.land/std@0.90.0/testing/asserts.ts";
 
 export enum EDE000GovernanceTokenErrCode {
   err_unauthorised=3000,
@@ -13,7 +12,7 @@ export enum EDE000GovernanceTokenErrCode {
 }
 
 export class EDE000GovernanceTokenClient {
-  contractName: string = "";
+  contractName = "";
   chain: Chain;
   deployer: Account;
 

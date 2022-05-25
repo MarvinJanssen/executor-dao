@@ -328,7 +328,7 @@ Clarinet.test({
     name: "Ensure edg tokens can be minted via a proposal.",
     fn(chain: Chain, accounts: Map<string, Account>) {
       const { contractEDP006, bobby, deployer, phil, daisy, ward, ede000GovernanceTokenClient } = utils.setup(chain, accounts)
-      utils.passProposal(true, utils, chain, accounts, contractEDP006)
+      utils.passProposal(0, chain, accounts, contractEDP006)
       ede000GovernanceTokenClient.edgGetBalance(bobby.address).result.expectOk().expectUint(3000)
       ede000GovernanceTokenClient.edgGetBalance(deployer.address).result.expectOk().expectUint(1000)
       ede000GovernanceTokenClient.edgGetBalance(phil.address).result.expectOk().expectUint(1900)
@@ -344,7 +344,7 @@ Clarinet.test({
     name: "Ensure edg tokens can be burned via a proposal.",
     fn(chain: Chain, accounts: Map<string, Account>) {
       const { contractEDP006, bobby, deployer, phil, daisy, ward, ede000GovernanceTokenClient } = utils.setup(chain, accounts)
-      utils.passProposal(true, utils, chain, accounts, contractEDP006)
+      utils.passProposal(0, chain, accounts, contractEDP006)
       ede000GovernanceTokenClient.edgGetBalance(bobby.address).result.expectOk().expectUint(3000)
       ede000GovernanceTokenClient.edgGetBalance(deployer.address).result.expectOk().expectUint(1000)
       ede000GovernanceTokenClient.edgGetBalance(phil.address).result.expectOk().expectUint(1900)
@@ -360,7 +360,7 @@ Clarinet.test({
     name: "Ensure edg tokens can be transferred via a proposal.",
     fn(chain: Chain, accounts: Map<string, Account>) {
       const { contractEDP006, bobby, deployer, phil, daisy, ward, ede000GovernanceTokenClient } = utils.setup(chain, accounts)
-      utils.passProposal(true, utils, chain, accounts, contractEDP006)
+      utils.passProposal(0, chain, accounts, contractEDP006)
       ede000GovernanceTokenClient.edgGetBalance(bobby.address).result.expectOk().expectUint(3000)
       ede000GovernanceTokenClient.edgGetBalance(deployer.address).result.expectOk().expectUint(1000)
       ede000GovernanceTokenClient.edgGetBalance(phil.address).result.expectOk().expectUint(1900)
@@ -376,7 +376,7 @@ Clarinet.test({
     name: "Ensure edg tokens can be locked via a proposal.",
     fn(chain: Chain, accounts: Map<string, Account>) {
       const { contractEDP006, bobby, deployer, phil, daisy, ward, ede000GovernanceTokenClient } = utils.setup(chain, accounts)
-      utils.passProposal(true, utils, chain, accounts, contractEDP006)
+      utils.passProposal(0, chain, accounts, contractEDP006)
       ede000GovernanceTokenClient.edgGetBalance(bobby.address).result.expectOk().expectUint(3000)
       ede000GovernanceTokenClient.edgGetBalance(deployer.address).result.expectOk().expectUint(1000)
       ede000GovernanceTokenClient.edgGetBalance(phil.address).result.expectOk().expectUint(1900)
