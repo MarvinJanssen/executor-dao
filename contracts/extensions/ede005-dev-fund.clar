@@ -16,9 +16,7 @@
 (define-constant err-no-allowance (err u3001))
 (define-constant err-already-claimed (err u3002))
 
-(define-data-var allowance-start-height uint u0)
-
-(define-map monthly-developer-allowances principal uint)
+(define-map monthly-developer-allowances principal {start-height: uint, allowance: uint})
 (define-map claim-counts principal uint)
 
 ;; --- Authorisation check
@@ -29,25 +27,18 @@
 
 ;; --- Internal DAO functions
 
-(define-public (set-allowance-start-height (start-height uint))
+(define-public (set-developer-allowance (start-height uint) (allowance uint) (who principal))
 	(begin
 		(try! (is-dao-or-extension))
-		(ok (var-set allowance-start-height start-height))
+		(ok (map-set monthly-developer-allowances who {start-height: start-height, allowance: allowance}))
 	)
 )
 
-(define-public (set-developer-allowance (allowance uint) (who principal))
-	(begin
-		(try! (is-dao-or-extension))
-		(ok (map-set monthly-developer-allowances who allowance))
-	)
+(define-private (set-developer-allowances-iter (item {start-height: uint, allowance: uint, who: principal}) (previous bool))
+	(map-set monthly-developer-allowances (get who item) {start-height: (get start-height item), allowance: (get allowance item)})
 )
 
-(define-private (set-developer-allowances-iter (item {allowance: uint, who: principal}) (previous bool))
-	(map-set monthly-developer-allowances (get who item) (get allowance item))
-)
-
-(define-public (set-developer-allowances (developers (list 200 {allowance: uint, who: principal})))
+(define-public (set-developer-allowances (developers (list 200 {start-height: uint, allowance: uint, who: principal})))
 	(begin
 		(try! (is-dao-or-extension))
 		(ok (fold set-developer-allowances-iter developers true))
@@ -64,7 +55,7 @@
 ;; --- Public functions
 
 (define-read-only (get-developer-allowance (who principal))
-	(default-to u0 (map-get? monthly-developer-allowances who))
+	(map-get? monthly-developer-allowances who)
 )
 
 (define-read-only (get-developer-claim-count (who principal))
@@ -74,17 +65,15 @@
 (define-public (claim (memo (optional (buff 34))))
 	(let
 		(
-			(allowance (get-developer-allowance tx-sender))
+			(entry (unwrap! (get-developer-allowance tx-sender) err-no-allowance))
 			(claim-count (get-developer-claim-count tx-sender))
-			(start-height (var-get allowance-start-height))
+			(start-height (get start-height entry))
 			(max-claims (/ (- block-height start-height) one-month-time))
 			(developer tx-sender)
 		)
-		(asserts! (> start-height u0) err-unauthorised)
-		(asserts! (> allowance u0) err-no-allowance)
 		(asserts! (< claim-count max-claims) err-already-claimed)
 		(map-set claim-counts tx-sender max-claims)
-		(as-contract (contract-call? .ede000-governance-token transfer (* (- max-claims claim-count) allowance) tx-sender developer memo))
+		(as-contract (contract-call? .ede000-governance-token transfer (* (- max-claims claim-count) (get allowance entry)) tx-sender developer memo))
 	)
 )
 
