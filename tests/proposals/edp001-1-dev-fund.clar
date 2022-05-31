@@ -22,11 +22,11 @@
 		)
 		;;(try! (contract-call? .ede005-dev-fund set-allowance-start-height block-height))
 		(try! (contract-call? .ede005-dev-fund set-developer-allowances (list
-			{who: 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG, allowance: u50}
-			{who: 'ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC, allowance: u0}
-			{who: 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5, allowance: u100}
-			{who: 'ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND, allowance: u200}
-			{who: 'STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6, allowance: u1}
+			{who: 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG, start-height: block-height, allowance: u50}
+			{who: 'ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC, start-height: block-height, allowance: u0}
+			{who: 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5, start-height: block-height, allowance: u100}
+			{who: 'ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND, start-height: block-height, allowance: u200}
+			{who: 'STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6, start-height: block-height, allowance: u1}
 			
 		)))
 		(try! (contract-call? .ede005-dev-fund transfer u500 'STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6 (some 0x7472616E736665722074657374)))

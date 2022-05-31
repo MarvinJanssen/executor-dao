@@ -36,7 +36,7 @@ export class EDE005DevFundClient {
       [types.uint(allowance), types.principal(who)], txSender);
   }
   setDeveloperAllowances(
-    developers: Array<{ allowance: number; who: string }>,
+    developers: Array<{ startHeight: number; allowance: number; who: string }>,
     sender: string
   ): Tx {
     return Tx.contractCall(
@@ -45,7 +45,7 @@ export class EDE005DevFundClient {
       [
         types.list(
           developers.map((entry) =>
-            types.tuple({ allowance: types.uint(entry.allowance), recipient: types.principal(entry.who) })
+            types.tuple({ recipient: types.principal(entry.who), allowance: types.uint(entry.allowance), startHeight: types.uint(entry.startHeight) })
           )
         )
       ], sender);

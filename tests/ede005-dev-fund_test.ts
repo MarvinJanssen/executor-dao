@@ -20,7 +20,6 @@ const attemptClaim = (i: number, amount: number, chain: Chain, block: any, toHei
   // let maxClaims = ede005DevFundClient.getMaxClaims().result
   ede005DevFundClient.getDeveloperClaimCount(address).result.expectUint(i)
   assert(block.receipts[0].events[0].ft_transfer_event.amount == amount)
-  //console.log(i + ' : Block height: ' + block.height + ' Claim count: ' + claim + ' Transferring: ', block.receipts[0].events[0].ft_transfer_event.amount + ' Result: ' + block.receipts[0].result.expectOk())
 }
 
 Clarinet.test({
@@ -35,8 +34,8 @@ Clarinet.test({
     } = utils.setup(chain, accounts);
 
     exeDaoClient.isExtension(contractEDE005).result.expectBool(false)
-    ede005DevFundClient.getDeveloperAllowance(daisy.address).result.expectUint(0)
-    ede005DevFundClient.getDeveloperAllowance(bobby.address).result.expectUint(0)
+    ede005DevFundClient.getDeveloperAllowance(daisy.address).result.expectNone()
+    ede005DevFundClient.getDeveloperAllowance(bobby.address).result.expectNone()
   }
 });
 
@@ -54,8 +53,8 @@ Clarinet.test({
 
     utils.passProposal(0, chain, accounts, contractEDP001)
     exeDaoClient.isExtension(contractEDE005).result.expectBool(true)
-    ede005DevFundClient.getDeveloperAllowance(daisy.address).result.expectUint(100)
-    ede005DevFundClient.getDeveloperAllowance(bobby.address).result.expectUint(20)
+    assert(ede005DevFundClient.getDeveloperAllowance(daisy.address).result === '(some {allowance: u100, start-height: u1736})')
+    assert(ede005DevFundClient.getDeveloperAllowance(bobby.address).result === '(some {allowance: u20, start-height: u1736})')
     ede005DevFundClient.getDeveloperClaimCount(daisy.address).result.expectUint(0)
     ede005DevFundClient.getDeveloperClaimCount(bobby.address).result.expectUint(0)
   }
@@ -74,7 +73,7 @@ Clarinet.test({
 
     let block = utils.passProposal(0, chain, accounts, contractEDP001)
     exeDaoClient.isExtension(contractEDE005).result.expectBool(true)
-    ede005DevFundClient.getDeveloperAllowance(phil.address).result.expectUint(0)
+    ede005DevFundClient.getDeveloperAllowance(phil.address).result.expectNone()
     block = chain.mineBlock([
       ede005DevFundClient.claim('I claim the funds', phil.address),
     ]);
@@ -102,7 +101,7 @@ Clarinet.test({
     let block = utils.passProposal(0, chain, accounts, contractEDP001)
     exeDaoClient.isExtension(contractEDE005).result.expectBool(true)
 
-    ede005DevFundClient.getDeveloperAllowance(bobby.address).result.expectUint(20)
+    assert(ede005DevFundClient.getDeveloperAllowance(bobby.address).result === '(some {allowance: u20, start-height: u1736})')
     block = chain.mineBlock([
       ede005DevFundClient.transfer(10, bobby.address, 'I claim the funds', deployer.address),
     ]);
@@ -124,8 +123,8 @@ Clarinet.test({
     let block = utils.passProposal(0, chain, accounts, contractEDP001)
     exeDaoClient.isExtension(contractEDE005).result.expectBool(true)
 
-    ede005DevFundClient.getDeveloperAllowance(daisy.address).result.expectUint(100)
-    ede005DevFundClient.getDeveloperAllowance(bobby.address).result.expectUint(20)
+    assert(ede005DevFundClient.getDeveloperAllowance(daisy.address).result === '(some {allowance: u100, start-height: u1736})')
+    assert(ede005DevFundClient.getDeveloperAllowance(bobby.address).result === '(some {allowance: u20, start-height: u1736})')
     block = chain.mineBlock([
       ede005DevFundClient.transfer(10, bobby.address, 'I claim the funds', daisy.address),
     ]);
@@ -169,17 +168,17 @@ Clarinet.test({
 
     let block = utils.passProposal(0, chain, accounts, contractEDP001)
 
-    ede005DevFundClient.getDeveloperAllowance(bobby.address).result.expectUint(20)
+    assert(ede005DevFundClient.getDeveloperAllowance(bobby.address).result === '(some {allowance: u20, start-height: u1736})')
 
     chain.mineEmptyBlock(1250);
 
     block = utils.passProposal(block.height, chain, accounts, contractEDP001_1)
 
-    ede005DevFundClient.getDeveloperAllowance(bobby.address).result.expectUint(0)
+    assert(ede005DevFundClient.getDeveloperAllowance(bobby.address).result === '(some {allowance: u0, start-height: u4719})')
     block = chain.mineBlock([
       ede005DevFundClient.claim('I claim the funds', bobby.address),
     ]);
-    block.receipts[0].result.expectErr().expectUint(EDE005DevFundErrCode.err_no_allowance)
+    block.receipts[0].result.expectErr().expectUint(EDE005DevFundErrCode.err_already_claimed)
   }
 });
 Clarinet.test({
@@ -194,13 +193,13 @@ Clarinet.test({
 
     let block = utils.passProposal(0, chain, accounts, contractEDP001)
 
-    ede005DevFundClient.getDeveloperAllowance(bobby.address).result.expectUint(20)
+    assert(ede005DevFundClient.getDeveloperAllowance(bobby.address).result === '(some {allowance: u20, start-height: u1736})')
 
     chain.mineEmptyBlock(1250);
 
     block = utils.passProposal(block.height, chain, accounts, contractEDP001_1)
 
-    ede005DevFundClient.getDeveloperAllowance(bobby.address).result.expectUint(0)
+    assert(ede005DevFundClient.getDeveloperAllowance(bobby.address).result === '(some {allowance: u0, start-height: u4719})')
   }
 });
 Clarinet.test({
@@ -215,13 +214,13 @@ Clarinet.test({
 
     let block = utils.passProposal(0, chain, accounts, contractEDP001)
 
-    ede005DevFundClient.getDeveloperAllowance(hunter.address).result.expectUint(0)
+    ede005DevFundClient.getDeveloperAllowance(hunter.address).result.expectNone()
 
     chain.mineEmptyBlock(1250);
 
     block = utils.passProposal(block.height, chain, accounts, contractEDP001_1)
 
-    ede005DevFundClient.getDeveloperAllowance(hunter.address).result.expectUint(200)
+    assert(ede005DevFundClient.getDeveloperAllowance(hunter.address).result === '(some {allowance: u200, start-height: u4719})')
   }
 });
 
@@ -238,13 +237,13 @@ Clarinet.test({
 
     const block = utils.passProposal(0, chain, accounts, contractEDP001)
 
-    ede005DevFundClient.getDeveloperAllowance(ward.address).result.expectUint(0)
+    ede005DevFundClient.getDeveloperAllowance(ward.address).result.expectNone()
 
     chain.mineEmptyBlock(1250);
 
     utils.passProposal(block.height, chain, accounts, contractEDP001_1)
 
-    ede005DevFundClient.getDeveloperAllowance(ward.address).result.expectUint(1)
+    assert(ede005DevFundClient.getDeveloperAllowance(ward.address).result === '(some {allowance: u1, start-height: u4719})')
     ede000GovernanceTokenClient.edgGetBalance(ward.address).result.expectOk().expectUint(500)
   }
 });
