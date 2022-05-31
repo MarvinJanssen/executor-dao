@@ -38,8 +38,8 @@ depends_on = ["ede000-governance-token", "executor-dao"]
 path = "contracts/proposals/edp002-kill-emergency-execute.clar"
 depends_on = ["ede004-emergency-execute", "executor-dao"]
 
-[contracts.edp003-whitelist-escrow-nft]
-path = "contracts/proposals/edp003-whitelist-escrow-nft.clar"
+[contracts.edp003-manage-escrow-nft]
+path = "contracts/proposals/edp003-manage-escrow-nft.clar"
 depends_on = ["proposal-trait", "nft-escrow"]
 
 

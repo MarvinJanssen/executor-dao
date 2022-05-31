@@ -9,7 +9,7 @@ import {
 export enum NftEscrowErrorCode {
   err_sender_same_as_recipient=2,
   err_not_contract_owner=100,
-  err_not_whitelisted=101,
+  err_not_allowed=101,
   err_unknown_escrow=102,
   err_wrong_nft=103,
   err_not_nft_owner=104,
@@ -32,10 +32,10 @@ export class NftEscrowClient {
       "set-contract-owner",
       [types.principal(newOwner)], txSender);
   }
-  setWhitelisted(nft: string, enabled: boolean, txSender: string): Tx {
+  setAllowed(nft: string, enabled: boolean, txSender: string): Tx {
     return Tx.contractCall(
       this.contractName,
-      "set-whitelisted",
+      "set-allowed",
       [types.principal(nft), types.bool(enabled)], txSender);
   }
   placeInEscrow(tokenId: number, recipient: string, amount: number, nft: string, txSender: string): Tx {
@@ -63,8 +63,8 @@ export class NftEscrowClient {
   getContractOwner(): ReadOnlyFn {
     return this.callReadOnlyFn("get-contract-owner", []);
   }
-  isWhitelisted(nft: string): ReadOnlyFn {
-    return this.callReadOnlyFn("is-whitelisted", [types.principal(nft)]);
+  isAllowed(nft: string): ReadOnlyFn {
+    return this.callReadOnlyFn("is-allowed", [types.principal(nft)]);
   }
 
   private callReadOnlyFn(

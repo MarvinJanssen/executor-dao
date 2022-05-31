@@ -19,8 +19,8 @@ Clarinet.test({
 
     utils.constructDao(chain, contractEDP000, deployer, exeDaoClient)
     exeDaoClient.isExtension(contractNftEscrow).result.expectBool(false)
-    nftEscrowClient.isWhitelisted(contractNft).result.expectBool(false)
-    nftEscrowClient.isWhitelisted(contractNft).result.expectBool(false)
+    nftEscrowClient.isAllowed(contractNft).result.expectBool(false)
+    nftEscrowClient.isAllowed(contractNft).result.expectBool(false)
   }
 });
 
@@ -38,13 +38,13 @@ Clarinet.test({
 
     utils.constructDao(chain, contractEDP000, deployer, exeDaoClient)
     const block = chain.mineBlock([
-      nftEscrowClient.setWhitelisted(contractNft, true, phil.address),
-      nftEscrowClient.setWhitelisted(contractNft, true, deployer.address)
+      nftEscrowClient.setAllowed(contractNft, true, phil.address),
+      nftEscrowClient.setAllowed(contractNft, true, deployer.address)
     ]);
     block.receipts[0].result.expectErr().expectUint(NftEscrowErrorCode.err_not_contract_owner)
     block.receipts[1].result.expectOk().expectBool(true)
 
-    nftEscrowClient.isWhitelisted(contractNft).result.expectBool(true)
+    nftEscrowClient.isAllowed(contractNft).result.expectBool(true)
   }
 });
 
@@ -63,12 +63,12 @@ Clarinet.test({
     utils.constructDao(chain, contractEDP000, deployer, exeDaoClient)
     const block = chain.mineBlock([
       nftEscrowClient.setContractOwner(contractEXD, deployer.address),
-      nftEscrowClient.setWhitelisted(contractNft, true, deployer.address),
+      nftEscrowClient.setAllowed(contractNft, true, deployer.address),
     ]);
     block.receipts[0].result.expectOk().expectBool(true)
     block.receipts[1].result.expectErr().expectUint(NftEscrowErrorCode.err_not_contract_owner)
 
-    nftEscrowClient.isWhitelisted(contractNft).result.expectBool(false)
+    nftEscrowClient.isAllowed(contractNft).result.expectBool(false)
   }
 });
 
@@ -93,7 +93,7 @@ Clarinet.test({
     block.receipts[0].result.expectOk().expectBool(true)
     utils.passProposal(block.height, chain, accounts, contractEDP008_1)
 
-    nftEscrowClient.isWhitelisted(contractNft).result.expectBool(true)
+    nftEscrowClient.isAllowed(contractNft).result.expectBool(true)
   }
 });
 
@@ -129,7 +129,7 @@ Clarinet.test({
     block.receipts[0].result.expectOk().expectBool(true)
     utils.passProposal(block.height, chain, accounts, contractEDP008_1)
 
-    nftEscrowClient.isWhitelisted(contractNft).result.expectBool(true)
+    nftEscrowClient.isAllowed(contractNft).result.expectBool(true)
     nftClient.getOwner(1).result.expectOk().expectSome().expectPrincipal(daisy.address)
     nftClient.getOwner(2).result.expectOk().expectSome().expectPrincipal(bobby.address)
   }
@@ -168,7 +168,7 @@ Clarinet.test({
     block.receipts[0].result.expectOk().expectBool(true)
 
     utils.passProposal(block.height, chain, accounts, contractEDP008_1)
-    nftEscrowClient.isWhitelisted(contractNft).result.expectBool(true)
+    nftEscrowClient.isAllowed(contractNft).result.expectBool(true)
 
     block = chain.mineBlock([
       nftEscrowClient.placeInEscrow(1, bobby.address, 100, contractNft, daisy.address)
@@ -212,7 +212,7 @@ Clarinet.test({
     block.receipts[0].result.expectOk().expectBool(true)
 
     utils.passProposal(block.height, chain, accounts, contractEDP008_1)
-    nftEscrowClient.isWhitelisted(contractNft).result.expectBool(true)
+    nftEscrowClient.isAllowed(contractNft).result.expectBool(true)
 
     block = chain.mineBlock([
       nftEscrowClient.placeInEscrow(1, bobby.address, 100, contractNft, daisy.address)
@@ -262,7 +262,7 @@ Clarinet.test({
     block.receipts[0].result.expectOk().expectBool(true)
 
     utils.passProposal(block.height, chain, accounts, contractEDP008_1)
-    nftEscrowClient.isWhitelisted(contractNft).result.expectBool(true)
+    nftEscrowClient.isAllowed(contractNft).result.expectBool(true)
 
     block = chain.mineBlock([
       nftEscrowClient.placeInEscrow(1, daisy.address, 100, contractNft, daisy.address)
@@ -301,7 +301,7 @@ Clarinet.test({
     block.receipts[0].result.expectOk().expectBool(true)
 
     utils.passProposal(block.height, chain, accounts, contractEDP008_1)
-    nftEscrowClient.isWhitelisted(contractNft).result.expectBool(true)
+    nftEscrowClient.isAllowed(contractNft).result.expectBool(true)
 
     block = chain.mineBlock([
       nftEscrowClient.placeInEscrow(1, daisy.address, 100, contractNft, daisy.address),
@@ -342,7 +342,7 @@ Clarinet.test({
     block.receipts[0].result.expectOk().expectBool(true)
 
     utils.passProposal(block.height, chain, accounts, contractEDP008_1)
-    nftEscrowClient.isWhitelisted(contractNft).result.expectBool(true)
+    nftEscrowClient.isAllowed(contractNft).result.expectBool(true)
 
     block = chain.mineBlock([
       nftEscrowClient.placeInEscrow(1, daisy.address, 100, contractNft, daisy.address),

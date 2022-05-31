@@ -14,7 +14,7 @@
 (define-public (execute (sender principal))
 	(begin
 		;; Change governance token.
-		(try! (contract-call? .nft-escrow set-whitelisted 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.sip009-nft true))
+		(try! (contract-call? .nft-escrow set-allowed 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.sip009-nft true))
 
 		(print "Unit Test: ExecutorDAO emergency executive extension settings updated.")
 		(ok true)
