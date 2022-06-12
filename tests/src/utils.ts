@@ -110,12 +110,12 @@ export class Utils {
     const contractEDP001 = accounts.get("deployer")!.address + '.edp001-dev-fund';
     const contractEDP001_1 = accounts.get("deployer")!.address + '.edp001-1-dev-fund';
     const contractEDP002 = accounts.get("deployer")!.address + '.edp002-kill-emergency-execute';
-    const contractEDP003 = accounts.get("deployer")!.address + '.edp003-manage-escrow-nft';
+    const contractEDP003 = accounts.get("deployer")!.address + '.edp003-allowlist-escrow-nft';
     const contractEDP004 = accounts.get("deployer")!.address + '.edp004-dao-change-governance';
     const contractEDP005 = accounts.get("deployer")!.address + '.edp005-dao-change-sample-config';
     const contractEDP006 = accounts.get("deployer")!.address + '.edp006-dao-mint-burn-edg';
     const contractEDP007 = accounts.get("deployer")!.address + '.edp007-dao-update-executive';
-    const contractEDP008_1 = accounts.get("deployer")!.address + '.edp008-1-manage-nft-escrow';
+    const contractEDP008_1 = accounts.get("deployer")!.address + '.edp008-1-allowlist-nft-escrow';
     const contractEDE000 = accounts.get("deployer")!.address + '.ede000-governance-token';
     const contractEDE000_1 = accounts.get("deployer")!.address + '.ede000-governance-token-v2';
     const contractEDE001 = accounts.get("deployer")!.address + '.ede001-proposal-voting';

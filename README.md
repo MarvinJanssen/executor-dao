@@ -73,9 +73,9 @@ Enables the EDE005 Dev Fund extension, mints an amount of tokens for it equal to
 
 Immediately disables EDE004 Emergency Execute if it passes.
 
-### EDE003: Manage Escrow NFT
+### EDE003: Allowlist Escrow NFT
 
-A simple example on how ExecutorDAO can manage third-party smart contracts.
+A simple example on how ExecutorDAO can add third-party smart contracts to be allowlisted.
 
 ## Testing
 
