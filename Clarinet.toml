@@ -1,9 +1,16 @@
 [project]
 name = "executor-dao"
+authors = []
+description = ""
+telemetry = false
 requirements = []
-
+costs_version = 2
 [contracts.ede000-governance-token]
 path = "contracts/extensions/ede000-governance-token.clar"
+depends_on = ["executor-dao", "governance-token-trait", "sip010-ft-trait"]
+
+[contracts.ede000-governance-token-v2]
+path = "tests/proposals/ede000-governance-token-v2.clar"
 depends_on = ["executor-dao", "governance-token-trait", "sip010-ft-trait"]
 
 [contracts.ede001-proposal-voting]
@@ -26,9 +33,21 @@ depends_on = ["executor-dao", "extension-trait", "ede001-proposal-voting"]
 path = "contracts/extensions/ede005-dev-fund.clar"
 depends_on = ["executor-dao", "extension-trait", "ede000-governance-token"]
 
+[contracts.ede006-treasury]
+path = "contracts/extensions/ede006-treasury.clar"
+depends_on = ["executor-dao", "extension-trait"]
+
+[contracts.ede007-governance-token-sale]
+path = "contracts/extensions/ede007-governance-token-sale.clar"
+depends_on = ["executor-dao", "extension-trait", "ede000-governance-token", "ede006-treasury"]
+
 [contracts.edp000-bootstrap]
 path = "contracts/proposals/edp000-bootstrap.clar"
 depends_on = ["executor-dao", "proposal-trait", "extension-trait", "ede000-governance-token", "ede001-proposal-voting", "ede002-proposal-submission", "ede003-emergency-proposals", "ede004-emergency-execute"]
+
+[contracts.edp001-1-dev-fund]
+path = "tests/proposals/edp001-1-dev-fund.clar"
+depends_on = ["ede000-governance-token", "executor-dao"]
 
 [contracts.edp001-dev-fund]
 path = "contracts/proposals/edp001-dev-fund.clar"
@@ -42,29 +61,12 @@ depends_on = ["ede004-emergency-execute", "executor-dao"]
 path = "contracts/proposals/edp003-allowlist-escrow-nft.clar"
 depends_on = ["proposal-trait", "nft-escrow"]
 
-
-[contracts.sip009-nft]
-path = "tests/proposals/sip009-nft.clar"
-depends_on = ["sip009-nft-trait"]
-
-[contracts.sip009-nft-trait]
-path = "tests/proposals/sip009-nft-trait.clar"
-depends_on = []
-
-[contracts.ede000-governance-token-v2]
-path = "tests/proposals/ede000-governance-token-v2.clar"
-depends_on = ["executor-dao", "governance-token-trait", "sip010-ft-trait"]
-
-[contracts.edp001-1-dev-fund]
-path = "tests/proposals/edp001-1-dev-fund.clar"
-depends_on = ["ede000-governance-token", "executor-dao"]
+[contracts.edp004-dao-change-governance]
+path = "tests/proposals/edp004-dao-change-governance.clar"
+depends_on = ["proposal-trait"]
 
 [contracts.edp005-dao-change-sample-config]
 path = "tests/proposals/edp005-dao-change-sample-config.clar"
-depends_on = ["proposal-trait"]
-
-[contracts.edp004-dao-change-governance]
-path = "tests/proposals/edp004-dao-change-governance.clar"
 depends_on = ["proposal-trait"]
 
 [contracts.edp006-dao-mint-burn-edg]
@@ -78,7 +80,6 @@ depends_on = ["proposal-trait"]
 [contracts.edp008-1-allowlist-nft-escrow]
 path = "tests/proposals/edp008-1-allowlist-nft-escrow.clar"
 depends_on = ["proposal-trait"]
-
 
 [contracts.executor-dao]
 path = "contracts/executor-dao.clar"
@@ -102,6 +103,14 @@ depends_on = []
 
 [contracts.proposal-trait]
 path = "contracts/traits/proposal-trait.clar"
+depends_on = []
+
+[contracts.sip009-nft]
+path = "tests/proposals/sip009-nft.clar"
+depends_on = ["sip009-nft-trait"]
+
+[contracts.sip009-nft-trait]
+path = "tests/proposals/sip009-nft-trait.clar"
 depends_on = []
 
 [contracts.sip010-ft-trait]
