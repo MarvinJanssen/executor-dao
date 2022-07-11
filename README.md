@@ -81,22 +81,22 @@ A simple example on how ExecutorDAO can manage third-party smart contracts.
 
 Unit tests coming soon, for now you can try it out manually in a `clarinet console` session. Execute the bootstrap proposal and have at it:
 
-```clojure
+```clarity
 (contract-call? .executor-dao construct .edp000-bootstrap)
 ```
 
 To propose `edp001-dev-fund`, run the following commands one by one:
 
-```clojure
+```clarity
 ;; Submit the proposal via extension EDE002, starting
 ;; the voting process at block-height + 144.
-(contract-call? .ede002-proposal-submission propose .edp001-dev-fund (+ block-height u144) .ede000-governance-token)
+(contract-call? .ede002-proposal-submission propose .edp001-dev-fund (+ block-height u144))
 
 ;; Advance the chain 144 blocks.
 ::advance_chain_tip 144
 
 ;; Vote YES with 100 tokens.
-(contract-call? .ede001-proposal-voting vote u100 true .edp001-dev-fund .ede000-governance-token)
+(contract-call? .ede001-proposal-voting vote u100 true .edp001-dev-fund)
 
 ;; (Optional) take a look at the current proposal data.
 (contract-call? .ede001-proposal-voting get-proposal-data .edp001-dev-fund)
