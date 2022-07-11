@@ -8,7 +8,7 @@ depends_on = ["executor-dao", "governance-token-trait", "sip010-ft-trait"]
 
 [contracts.ede001-proposal-voting]
 path = "contracts/extensions/ede001-proposal-voting.clar"
-depends_on = ["executor-dao", "proposal-trait", "extension-trait", "governance-token-trait", "ede000-governance-token"]
+depends_on = ["executor-dao", "proposal-trait", "extension-trait", "ede000-governance-token"]
 
 [contracts.ede002-proposal-submission]
 path = "contracts/extensions/ede002-proposal-submission.clar"

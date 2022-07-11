@@ -14,8 +14,6 @@
 (define-public (execute (sender principal))
 	(begin
 		;; Change governance token.
-		(try! (contract-call? .ede001-proposal-voting     set-governance-token .ede000-governance-token-v2))
-		(try! (contract-call? .ede002-proposal-submission set-governance-token .ede000-governance-token-v2))
 		(try! (contract-call? .ede002-proposal-submission set-parameter "minimum-proposal-start-delay" u288))
 		(try! (contract-call? .ede003-emergency-proposals set-emergency-team-member 'ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC true))
 		(try! (contract-call? .ede004-emergency-execute set-signals-required u2))
