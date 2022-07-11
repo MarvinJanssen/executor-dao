@@ -1,6 +1,6 @@
 ;; Title: EDE002 Proposal Submission
 ;; Author: Marvin Janssen
-;; Depends-On: EDE001
+;; Depends-On: EDE000, EDE001
 ;; Synopsis:
 ;; This extension part of the core of ExecutorDAO. It allows governance token
 ;; holders to submit proposals when they hold at least n% percentage of the
@@ -14,7 +14,6 @@
 
 (impl-trait .extension-trait.extension-trait)
 (use-trait proposal-trait .proposal-trait.proposal-trait)
-(use-trait governance-token-trait .governance-token-trait.governance-token-trait)
 
 (define-constant err-unauthorised (err u3100))
 (define-constant err-not-governance-token (err u3101))
@@ -22,8 +21,6 @@
 (define-constant err-unknown-parameter (err u3103))
 (define-constant err-proposal-minimum-start-delay (err u3104))
 (define-constant err-proposal-maximum-start-delay (err u3105))
-
-(define-data-var governance-token-principal principal .ede000-governance-token)
 
 (define-map parameters (string-ascii 34) uint)
 
@@ -39,15 +36,6 @@
 )
 
 ;; --- Internal DAO functions
-
-;; Governance token
-
-(define-public (set-governance-token (governance-token <governance-token-trait>))
-	(begin
-		(try! (is-dao-or-extension))
-		(ok (var-set governance-token-principal (contract-of governance-token)))
-	)
-)
 
 ;; Parameters
 
@@ -76,16 +64,6 @@
 
 ;; --- Public functions
 
-;; Governance token
-
-(define-read-only (get-governance-token)
-	(var-get governance-token-principal)
-)
-
-(define-private (is-governance-token (governance-token <governance-token-trait>))
-	(ok (asserts! (is-eq (contract-of governance-token) (var-get governance-token-principal)) err-not-governance-token))
-)
-
 ;; Parameters
 
 (define-read-only (get-parameter (parameter (string-ascii 34)))
@@ -94,12 +72,11 @@
 
 ;; Proposals
 
-(define-public (propose (proposal <proposal-trait>) (start-block-height uint) (governance-token <governance-token-trait>))
+(define-public (propose (proposal <proposal-trait>) (start-block-height uint))
 	(begin
-		(try! (is-governance-token governance-token))
 		(asserts! (>= start-block-height (+ block-height (try! (get-parameter "minimum-proposal-start-delay")))) err-proposal-minimum-start-delay)
 		(asserts! (<= start-block-height (+ block-height (try! (get-parameter "maximum-proposal-start-delay")))) err-proposal-maximum-start-delay)
-		(asserts! (try! (contract-call? governance-token edg-has-percentage-balance tx-sender (try! (get-parameter "propose-factor")))) err-insufficient-balance)
+		(asserts! (unwrap-panic (contract-call? .ede000-governance-token edg-has-percentage-balance tx-sender (try! (get-parameter "propose-factor")))) err-insufficient-balance)
 		(contract-call? .ede001-proposal-voting add-proposal
 			proposal
 			{
